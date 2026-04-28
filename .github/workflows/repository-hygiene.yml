@@ -1,0 +1,44 @@
+name: Repository Hygiene
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  structure-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate required files
+        run: |
+          test -f README.md
+          test -f CHANGELOG.md
+          test -f CONTRIBUTING.md
+          test -f SECURITY.md
+          test -f docs/planning/phase-1-execution-plan.md
+          test -f docs/product/project-summary.md
+          test -f docs/architecture/repository-structure.md
+          test -f docs/github/repository-metadata.md
+
+      - name: Validate required directories
+        run: |
+          test -d archive/source-submission/proposal
+          test -d archive/source-submission/uml
+          test -d apps/officer-pwa
+          test -d apps/admin-web
+          test -d services/api
+          test -d tests/unit
+          test -d tests/integration
+          test -d tests/e2e
+
+      - name: Block macOS metadata files
+        run: |
+          if find . -name '.DS_Store' -print | grep -q .; then
+            echo "Found forbidden .DS_Store files"
+            find . -name '.DS_Store' -print
+            exit 1
+          fi
