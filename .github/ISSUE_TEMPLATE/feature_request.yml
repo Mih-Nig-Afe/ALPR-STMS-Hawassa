@@ -1,0 +1,40 @@
+name: Feature Request
+description: Propose a scoped enhancement
+title: "[Feature]: "
+labels:
+  - enhancement
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem Statement
+      description: What operational problem does this solve?
+    validations:
+      required: true
+  - type: dropdown
+    id: phase
+    attributes:
+      label: Intended Phase
+      options:
+        - Phase 1
+        - Phase 2
+        - Phase 3
+        - Phase 4
+        - Cross-phase
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed Change
+    validations:
+      required: true
+  - type: textarea
+    id: impact
+    attributes:
+      label: Scope and Risk Impact
+      description: Note effects on alerts, payments, complaints, RBAC, evidence, or auditability
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Dependencies

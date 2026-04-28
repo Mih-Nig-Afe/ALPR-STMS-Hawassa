@@ -1,0 +1,62 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Editors
+.idea/
+.vscode/
+*.swp
+*.swo
+*.tmp
+*.bak
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+.venv/
+venv/
+env/
+
+# Node / frontend
+node_modules/
+dist/
+build/
+.next/
+.nuxt/
+.vite/
+coverage/
+
+# Flutter / Dart
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+build/
+
+# Logs
+*.log
+logs/
+
+# Local env
+.env
+.env.*
+
+# Infrastructure
+.terraform/
+*.tfstate
+*.tfstate.*
+
+# Runtime / uploads
+tmp/
+temp/
+uploads/
+storage/
+
+# GitHub editor artifacts
+*.orig
