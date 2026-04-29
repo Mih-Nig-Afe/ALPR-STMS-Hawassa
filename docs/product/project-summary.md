@@ -65,8 +65,10 @@ Future-phase actors:
 ## Recommended Technical Position
 
 - Backend: FastAPI
-- Database: PostgreSQL
-- Officer client: mobile-first PWA
-- Office/admin client: web application
-- Evidence storage: object-storage-compatible repository
-- Maps: OpenStreetMap-based integration
+- Frontend: server-rendered web with Jinja2, HTMX, Alpine.js, and Bootstrap 5
+- Database: self-hosted Supabase subset using PostgreSQL and PostgREST
+- Officer client: mobile-first PWA served by FastAPI
+- Office/admin client: web application served by FastAPI
+- Evidence storage: self-hosted Supabase Storage API with file backend in Phase 1
+- Background processing: Python worker using a database outbox pattern
+- Maps: OpenStreetMap-based integration via Leaflet

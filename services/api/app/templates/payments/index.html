@@ -1,0 +1,46 @@
+{% extends "shared/base.html" %}
+
+{% block content %}
+<section class="panel">
+  <div class="panel-header">
+    <h2 class="h5 mb-1">Payment requests</h2>
+    <p class="text-muted mb-0">Simulate gateway callbacks during Phase 1 integration.</p>
+  </div>
+  <div class="table-responsive">
+    <table class="table align-middle">
+      <thead>
+        <tr>
+          <th>Reference</th>
+          <th>Violation</th>
+          <th>Amount</th>
+          <th>Status</th>
+          <th>Callback</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for payment in payment_requests %}
+        <tr>
+          <td>{{ payment.reference_code }}</td>
+          <td><a href="/violations/{{ payment.violation.id }}">{{ payment.violation.reference_code }}</a></td>
+          <td>{{ payment.amount }}</td>
+          <td><span class="badge text-bg-secondary">{{ payment.status }}</span></td>
+          <td>
+            <form method="post" action="/payments/{{ payment.id }}/simulate" class="d-flex gap-2">
+              <select class="form-select form-select-sm" name="outcome">
+                <option value="success">Success</option>
+                <option value="failed">Failed</option>
+              </select>
+              <input class="form-control form-control-sm" name="notes" placeholder="Callback notes">
+              <button class="btn btn-sm btn-primary" type="submit">Apply</button>
+            </form>
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="5" class="text-muted">No payment requests yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}
+

@@ -1,0 +1,21 @@
+services:
+  api:
+    volumes:
+      - .:/workspace
+
+  worker:
+    volumes:
+      - .:/workspace
+
+  supabase-db:
+    ports:
+      - "55432:5432"
+
+  supabase-rest:
+    ports:
+      - "13000:3000"
+
+  supabase-storage:
+    ports:
+      - "15000:5000"
+

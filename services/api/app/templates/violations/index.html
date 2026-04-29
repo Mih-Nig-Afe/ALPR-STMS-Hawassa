@@ -1,0 +1,106 @@
+{% extends "shared/base.html" %}
+
+{% block content %}
+<div class="row g-4">
+  <div class="col-xl-5">
+    <section class="panel">
+      <div class="panel-header">
+        <h2 class="h5 mb-1">Report violation</h2>
+        <p class="text-muted mb-0">Capture the incident, location, evidence, and escape path.</p>
+      </div>
+      <form method="post" action="/violations" enctype="multipart/form-data" class="d-grid gap-3" data-violation-form>
+        <input type="hidden" name="submission_ref" id="submission_ref">
+        <input type="hidden" name="latitude" id="latitude">
+        <input type="hidden" name="longitude" id="longitude">
+        <input type="hidden" name="escape_path_geojson" id="escape_path_geojson">
+
+        <div>
+          <label class="form-label" for="rule_id">Violation rule</label>
+          <select class="form-select" id="rule_id" name="rule_id" required>
+            <option value="">Select a rule</option>
+            {% for rule in rules %}
+            <option value="{{ rule.id }}">{{ rule.name }} ({{ rule.penalty_amount }})</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label" for="vehicle_plate">Vehicle plate</label>
+            <input class="form-control" id="vehicle_plate" name="vehicle_plate" placeholder="ET-12345" required>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label" for="driver_phone_number">Driver phone</label>
+            <input class="form-control" id="driver_phone_number" name="driver_phone_number" placeholder="+2519...">
+          </div>
+        </div>
+
+        <div>
+          <label class="form-label" for="location_text">Location description</label>
+          <input class="form-control" id="location_text" name="location_text" placeholder="Main road near..." required>
+        </div>
+
+        <div>
+          <label class="form-label" for="evidence">Evidence photo</label>
+          <input class="form-control" id="evidence" name="evidence" type="file" accept="image/*">
+        </div>
+
+        <div>
+          <label class="form-label" for="notes">Notes</label>
+          <textarea class="form-control" id="notes" name="notes" rows="3" placeholder="Incident notes"></textarea>
+        </div>
+
+        <div>
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <label class="form-label mb-0">Escape path</label>
+            <span class="small text-muted">Tap points on the map to build the path.</span>
+          </div>
+          <div id="escape-path-map" class="map-panel"></div>
+        </div>
+
+        <button class="btn btn-primary" type="submit" data-submit-once>Save and broadcast</button>
+      </form>
+    </section>
+  </div>
+
+  <div class="col-xl-7">
+    <section class="panel">
+      <div class="panel-header">
+        <h2 class="h5 mb-1">Recent violations</h2>
+        <p class="text-muted mb-0">Latest reports created by this officer.</p>
+      </div>
+      <div class="table-responsive">
+        <table class="table align-middle">
+          <thead>
+            <tr>
+              <th>Reference</th>
+              <th>Rule</th>
+              <th>Status</th>
+              <th>Plate</th>
+              <th>Updated</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for violation in violations %}
+            <tr>
+              <td><a href="/violations/{{ violation.id }}">{{ violation.reference_code }}</a></td>
+              <td>{{ violation.rule.name }}</td>
+              <td><span class="badge text-bg-secondary">{{ violation.status }}</span></td>
+              <td>{{ violation.vehicle_plate }}</td>
+              <td>{{ violation.updated_at.strftime('%Y-%m-%d %H:%M') if violation.updated_at else '' }}</td>
+            </tr>
+            {% else %}
+            <tr><td colspan="5" class="text-muted">No violations yet.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/violation-form.js"></script>
+{% endblock %}
+

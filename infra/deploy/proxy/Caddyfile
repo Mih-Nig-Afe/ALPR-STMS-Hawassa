@@ -1,0 +1,28 @@
+{
+	auto_https off
+	admin off
+}
+
+:80 {
+	encode gzip zstd
+
+	handle /storage/* {
+		uri strip_prefix /storage
+		reverse_proxy supabase-storage:5000
+	}
+
+	handle /rest/* {
+		uri strip_prefix /rest
+		reverse_proxy supabase-rest:3000
+	}
+
+	handle /mail/* {
+		uri strip_prefix /mail
+		reverse_proxy mailhog:8025
+	}
+
+	handle {
+		reverse_proxy api:8000
+	}
+}
+

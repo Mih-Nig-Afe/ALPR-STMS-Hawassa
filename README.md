@@ -1,64 +1,77 @@
 # ALPR-Based Smart Traffic Management System for Hawassa City
 
-Manual-enforcement-first smart traffic management platform for Hawassa City, structured for phased delivery from Phase 1 digital reporting to future CCTV-assisted and ALPR-enabled enforcement.
+Manual-enforcement-first traffic enforcement platform for Hawassa City, structured for phased delivery from Phase 1 field reporting to later CCTV-assisted and ALPR-enabled enforcement.
 
 ## Status
 
-- Repository bootstrap: complete
-- Source artifact preservation: complete
-- Phase 1 execution plan: complete
-- Production implementation: not started
+- Repository formalization: in progress
+- Docker-first runtime baseline: in progress
+- FastAPI service scaffold: in progress
+- Self-hosted Supabase subset: in progress
+- Phase 1 workflow tracker: active
 
-## Purpose
+## Phase 1 Target
 
-This repository formalizes the project foundation for the `ALPR STMS` initiative and prepares it for disciplined implementation, governance, and future GitHub collaboration.
-
-The immediate target is **Phase 1**:
+This repository is currently locked to **Phase 1** only:
 - manual digital violation reporting
-- timestamp and GPS capture
-- alert broadcasting
-- complaint handling
-- payment request initiation
-- audit logging
+- GPS and timestamp capture
+- alert broadcasting across subcity assignments
+- complaint intake and review
+- payment request initiation and callback handling
+- audit logging on every state transition
 
-The repository is intentionally structured so later phases can add CCTV ingestion, ALPR processing, and predictive intelligence without reorganizing the codebase.
+Phase 1 explicitly excludes:
+- live CCTV ingestion
+- ALPR/OCR processing
+- predictive routing
+- automated violation generation
+
+## Runtime Position
+
+- Backend: `FastAPI`
+- Frontend: `Jinja2 + HTMX + Alpine.js + Bootstrap 5` with local assets
+- Database: self-hosted Supabase subset using `PostgreSQL + PostgREST + Storage API`
+- Auth: FastAPI-managed cookie sessions with RBAC
+- Maps: `OpenStreetMap` via `Leaflet`
+- Packaging: Docker Compose for local, staging, and single-host production
+- Background work: Python worker with a database outbox pattern
 
 ## Repository Layout
 
 ```text
 .
-├── .github/                  GitHub issue and PR templates
-├── apps/                     User-facing clients
+├── .github/                  GitHub templates and repository checks
+├── apps/                     Reserved client ownership boundaries
 │   ├── admin-web/
 │   └── officer-pwa/
 ├── archive/                  Preserved original source artifacts
-│   └── source-submission/
-├── data/                     Seed and reference data
-├── docs/                     Formal project documentation
-│   ├── architecture/
-│   ├── github/
-│   ├── planning/
-│   ├── product/
-│   └── references/
-├── infra/                    Database, deployment, and observability scaffolding
-├── packages/                 Shared libraries and contracts
-├── scripts/                  Automation scripts
-├── services/                 Backend services
-│   └── api/
-└── tests/                    Unit, integration, and end-to-end tests
+├── data/                     Seed data and reference payloads
+├── docs/                     Product, architecture, planning, and operations docs
+├── infra/                    Database, deploy, and observability assets
+├── packages/                 Shared Python utilities and contracts
+├── scripts/                  Automation and smoke helpers
+├── services/
+│   ├── api/                  FastAPI application, templates, static assets
+│   └── worker/               Background event processor
+├── tests/                    Unit, integration, e2e, and smoke coverage
+├── compose.yaml              Primary Docker orchestration entrypoint
+└── compose.override.yaml     Local developer overlay
 ```
 
 ## Key Documents
 
 - Project summary: [docs/product/project-summary.md](docs/product/project-summary.md)
-- Repository structure guide: [docs/architecture/repository-structure.md](docs/architecture/repository-structure.md)
-- Phase 1 execution plan: [docs/planning/phase-1-execution-plan.md](docs/planning/phase-1-execution-plan.md)
+- Repository structure: [docs/architecture/repository-structure.md](docs/architecture/repository-structure.md)
+- Phase 1 master tracker: [docs/planning/phase-1-master-tracker.md](docs/planning/phase-1-master-tracker.md)
+- Phase 1 execution pointer: [docs/planning/phase-1-execution-plan.md](docs/planning/phase-1-execution-plan.md)
+- ADR 001 stack decision: [docs/architecture/adr-001-phase1-stack.md](docs/architecture/adr-001-phase1-stack.md)
+- ADR 002 database decision: [docs/architecture/adr-002-database-choice.md](docs/architecture/adr-002-database-choice.md)
 - GitHub metadata: [docs/github/repository-metadata.md](docs/github/repository-metadata.md)
 - Source archive index: [docs/references/source-archive-index.md](docs/references/source-archive-index.md)
 
 ## Preserved Source Artifacts
 
-The original academic and design artifacts are preserved under:
+The original academic and design submission remains preserved under `archive/source-submission/`:
 
 - [archive/source-submission/proposal](archive/source-submission/proposal)
 - [archive/source-submission/guidelines](archive/source-submission/guidelines)
@@ -66,31 +79,18 @@ The original academic and design artifacts are preserved under:
 - [archive/source-submission/references](archive/source-submission/references)
 - [archive/source-submission/uml](archive/source-submission/uml)
 
-These files are retained as the canonical submission baseline and should not be overwritten.
+These materials are archival references and should not be overwritten.
 
-## Recommended Implementation Stack
+## Local Operations
 
-- Backend: `FastAPI`
-- Database: `PostgreSQL`
-- Officer client: `PWA` first
-- Office/admin client: responsive web app
-- Maps: `OpenStreetMap`
-- Storage: object-storage-compatible evidence repository
-- Auth: RBAC with secure session management
+1. Copy `.env.example` to `.env`
+2. Build and start the stack with `make up`
+3. Open `http://localhost:8080`
+4. Review progress and acceptance gates in [docs/planning/phase-1-master-tracker.md](docs/planning/phase-1-master-tracker.md)
 
 ## Governance Notes
 
-- Keep Phase 1 scope strictly manual-enforcement-first.
-- Do not reintroduce Phase 2 or Phase 3 features into the initial build.
-- Treat the driver as an external payment participant, not an authenticated system user.
-- Preserve auditability on every state-changing operation.
-
-## Initial GitHub Position
-
-- Suggested repository visibility: `Private`
-- Suggested repository name: `alpr-stms-hawassa`
-- Suggested topics and description: documented in [docs/github/repository-metadata.md](docs/github/repository-metadata.md)
-
-## Next Implementation Step
-
-Freeze the Phase 1 functional baseline, choose the implementation stack formally, and create the first backend and client services inside `services/api`, `apps/officer-pwa`, and `apps/admin-web`.
+- Keep Phase 1 manual-enforcement-first.
+- Treat the driver as an external payment participant, not an authenticated user.
+- Record audit entries for every status mutation, decision, and payment event.
+- Update the master tracker in every implementation change set.

@@ -1,0 +1,65 @@
+:root {
+  --app-border: #d8dee6;
+  --app-bg: #f4f7fb;
+  --app-panel: #ffffff;
+  --app-text: #17212b;
+  --app-accent: #1d4ed8;
+  --app-accent-2: #0f766e;
+}
+
+body {
+  background: var(--app-bg);
+  color: var(--app-text);
+}
+
+.app-shell .panel,
+.login-panel {
+  background: var(--app-panel);
+  border: 1px solid var(--app-border);
+  border-radius: 8px;
+  padding: 1.25rem;
+}
+
+.panel-header {
+  margin-bottom: 1rem;
+}
+
+.map-panel {
+  min-height: 280px;
+  border: 1px solid var(--app-border);
+  border-radius: 8px;
+}
+
+.stat-panel {
+  min-height: 132px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.display-value {
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.login-shell {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+}
+
+.login-panel {
+  max-width: 100%;
+}
+
+code {
+  white-space: pre-wrap;
+}
+
+@media (max-width: 991px) {
+  .map-panel {
+    min-height: 240px;
+  }
+}
+

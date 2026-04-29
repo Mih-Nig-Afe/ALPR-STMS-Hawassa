@@ -1,0 +1,47 @@
+{% extends "shared/base.html" %}
+
+{% block content %}
+<section class="panel">
+  <div class="panel-header">
+    <h2 class="h5 mb-1">Complaint queue</h2>
+    <p class="text-muted mb-0">Review disputed reports and confirm or revoke them.</p>
+  </div>
+  <div class="table-responsive">
+    <table class="table align-middle">
+      <thead>
+        <tr>
+          <th>Violation</th>
+          <th>Reason</th>
+          <th>Status</th>
+          <th>Decision</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for complaint in complaints %}
+        <tr>
+          <td>
+            <div><a href="/violations/{{ complaint.violation.id }}">{{ complaint.violation.reference_code }}</a></div>
+            <div class="small text-muted">{{ complaint.violation.rule.name }}</div>
+          </td>
+          <td>{{ complaint.reason }}</td>
+          <td><span class="badge text-bg-secondary">{{ complaint.status }}</span></td>
+          <td>
+            <form method="post" action="/complaints/{{ complaint.id }}/decision" class="d-grid gap-2">
+              <select class="form-select form-select-sm" name="decision">
+                <option value="confirm">Confirm violation</option>
+                <option value="revoke">Revoke violation</option>
+              </select>
+              <input class="form-control form-control-sm" name="notes" placeholder="Decision notes">
+              <button class="btn btn-sm btn-primary" type="submit">Save</button>
+            </form>
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="4" class="text-muted">No complaints available.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}
+

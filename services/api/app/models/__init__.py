@@ -1,0 +1,38 @@
+from app.models.domain import (
+    AlertRecipient,
+    AuditLog,
+    Complaint,
+    ComplaintDecision,
+    OfficerAssignment,
+    OutboxEvent,
+    PaymentRequest,
+    PaymentTransaction,
+    Role,
+    SessionModel,
+    Subcity,
+    User,
+    Violation,
+    ViolationAlert,
+    ViolationEvidence,
+    ViolationRule,
+)
+
+__all__ = [
+    "AlertRecipient",
+    "AuditLog",
+    "Complaint",
+    "ComplaintDecision",
+    "OfficerAssignment",
+    "OutboxEvent",
+    "PaymentRequest",
+    "PaymentTransaction",
+    "Role",
+    "SessionModel",
+    "Subcity",
+    "User",
+    "Violation",
+    "ViolationAlert",
+    "ViolationEvidence",
+    "ViolationRule",
+]
+

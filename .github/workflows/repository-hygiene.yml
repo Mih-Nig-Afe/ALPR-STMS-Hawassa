@@ -19,9 +19,18 @@ jobs:
           test -f CHANGELOG.md
           test -f CONTRIBUTING.md
           test -f SECURITY.md
+          test -f compose.yaml
+          test -f compose.override.yaml
+          test -f pyproject.toml
+          test -f .env.example
+          test -f .env.staging.example
+          test -f .env.production.example
           test -f docs/planning/phase-1-execution-plan.md
+          test -f docs/planning/phase-1-master-tracker.md
           test -f docs/product/project-summary.md
           test -f docs/architecture/repository-structure.md
+          test -f docs/architecture/adr-001-phase1-stack.md
+          test -f docs/architecture/adr-002-database-choice.md
           test -f docs/github/repository-metadata.md
 
       - name: Validate required directories
@@ -31,9 +40,15 @@ jobs:
           test -d apps/officer-pwa
           test -d apps/admin-web
           test -d services/api
+          test -d services/worker
+          test -d infra/database/alembic
+          test -d infra/deploy/proxy
+          test -d data/seed/sql
+          test -d data/seed/json
           test -d tests/unit
           test -d tests/integration
           test -d tests/e2e
+          test -d tests/smoke
 
       - name: Block macOS metadata files
         run: |

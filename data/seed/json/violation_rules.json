@@ -1,0 +1,33 @@
+[
+  {
+    "code": "SPEEDING",
+    "name": "Speeding",
+    "description": "Vehicle exceeded the permitted speed limit.",
+    "penalty_amount": 1200.00
+  },
+  {
+    "code": "RED_LIGHT",
+    "name": "Red Light Violation",
+    "description": "Vehicle crossed an intersection after the signal turned red.",
+    "penalty_amount": 1500.00
+  },
+  {
+    "code": "ILLEGAL_PARKING",
+    "name": "Illegal Parking",
+    "description": "Vehicle was parked in a restricted or obstructive area.",
+    "penalty_amount": 800.00
+  },
+  {
+    "code": "NO_SEAT_BELT",
+    "name": "No Seat Belt",
+    "description": "Driver failed to use the required seat belt.",
+    "penalty_amount": 600.00
+  },
+  {
+    "code": "LANE_MISUSE",
+    "name": "Improper Lane Usage",
+    "description": "Vehicle changed or occupied lanes contrary to road rules.",
+    "penalty_amount": 950.00
+  }
+]
+

@@ -1,0 +1,43 @@
+{% extends "shared/base.html" %}
+
+{% block content %}
+<section class="panel">
+  <div class="panel-header">
+    <h2 class="h5 mb-1">Alert inbox</h2>
+    <p class="text-muted mb-0">Broadcasted reports awaiting review or acknowledgement.</p>
+  </div>
+  <div class="table-responsive">
+    <table class="table align-middle">
+      <thead>
+        <tr>
+          <th>Violation</th>
+          <th>Message</th>
+          <th>Recipient</th>
+          <th>Status</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for recipient in recipients %}
+        <tr>
+          <td><a href="/violations/{{ recipient.alert.violation.id }}">{{ recipient.alert.violation.reference_code }}</a></td>
+          <td>{{ recipient.alert.message }}</td>
+          <td>{{ recipient.user.full_name }}</td>
+          <td><span class="badge text-bg-secondary">{{ recipient.status }}</span></td>
+          <td class="text-end">
+            {% if recipient.status != 'ACKNOWLEDGED' %}
+            <form method="post" action="/alerts/{{ recipient.id }}/ack">
+              <button class="btn btn-sm btn-outline-primary" type="submit">Acknowledge</button>
+            </form>
+            {% endif %}
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="5" class="text-muted">No alerts found.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}
+
