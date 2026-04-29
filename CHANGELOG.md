@@ -28,6 +28,9 @@ All notable changes to this repository will be documented in this file.
 - Test suite expanded from 7 to 36 passing tests against the live Docker stack
 - End-to-end test `tests/e2e/test_violation_lifecycle.py` that drives the full lifecycle through the HTTP API: officer login -> violation submission -> alert acknowledgement -> stop dispute -> complaint confirmation -> signed gateway payment callback -> paid state assertion
 - `.github/workflows/ci.yml` GitHub Actions workflow that runs `ruff check`, `ruff format --check`, and the full `pytest` suite (unit + integration + e2e) inside the project's Docker Compose stack on every push to `main` and on every pull request
+- `docs/api/endpoints.md` Phase 1 HTTP API reference enumerating every route, role requirement, form/body shape, response, and the workflow state machines
+- `infra/deploy/docs/docker-operations.md` expanded with a production deployment runbook (host prep, secrets rotation, TLS, first boot, backups, monitoring, upgrades, rollback, scaling notes)
+- `README.md` status block, key documents list, and local-operations section updated to reflect Phase 1 close-out and link the new API reference, payment callback contract, and deployment runbook
 
 ### Changed
 

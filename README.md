@@ -4,11 +4,12 @@ Manual-enforcement-first traffic enforcement platform for Hawassa City, structur
 
 ## Status
 
-- Repository formalization: in progress
-- Docker-first runtime baseline: in progress
-- FastAPI service scaffold: in progress
-- Self-hosted Supabase subset: in progress
-- Phase 1 workflow tracker: active
+- Repository formalization: complete
+- Docker-first runtime baseline: complete
+- FastAPI service scaffold: complete
+- Self-hosted Supabase subset: complete
+- Phase 1 workflow tracker: closing out (see [`docs/planning/phase-1-master-tracker.md`](docs/planning/phase-1-master-tracker.md))
+- Continuous integration: lint + structure check + pytest on every push and pull request
 
 ## Phase 1 Target
 
@@ -64,6 +65,9 @@ Phase 1 explicitly excludes:
 - Repository structure: [docs/architecture/repository-structure.md](docs/architecture/repository-structure.md)
 - Phase 1 master tracker: [docs/planning/phase-1-master-tracker.md](docs/planning/phase-1-master-tracker.md)
 - Phase 1 execution pointer: [docs/planning/phase-1-execution-plan.md](docs/planning/phase-1-execution-plan.md)
+- API reference: [docs/api/endpoints.md](docs/api/endpoints.md)
+- Payment gateway callback contract: [docs/integrations/payment-callback.md](docs/integrations/payment-callback.md)
+- Docker operations and production runbook: [infra/deploy/docs/docker-operations.md](infra/deploy/docs/docker-operations.md)
 - ADR 001 stack decision: [docs/architecture/adr-001-phase1-stack.md](docs/architecture/adr-001-phase1-stack.md)
 - ADR 002 database decision: [docs/architecture/adr-002-database-choice.md](docs/architecture/adr-002-database-choice.md)
 - GitHub metadata: [docs/github/repository-metadata.md](docs/github/repository-metadata.md)
@@ -86,7 +90,11 @@ These materials are archival references and should not be overwritten.
 1. Copy `.env.example` to `.env`
 2. Build and start the stack with `make up`
 3. Open `http://localhost:8080`
-4. Review progress and acceptance gates in [docs/planning/phase-1-master-tracker.md](docs/planning/phase-1-master-tracker.md)
+4. Run the test suite with `docker compose run --rm api pytest`
+5. Review progress and acceptance gates in [docs/planning/phase-1-master-tracker.md](docs/planning/phase-1-master-tracker.md)
+
+For a full production deployment walkthrough (secrets, TLS, backups, upgrade
+and rollback procedures) see [`infra/deploy/docs/docker-operations.md`](infra/deploy/docs/docker-operations.md).
 
 ## Governance Notes
 
