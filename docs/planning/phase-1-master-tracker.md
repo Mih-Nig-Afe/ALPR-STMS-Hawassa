@@ -120,47 +120,47 @@
 
 | Table | Purpose | Status |
 | --- | --- | --- |
-| `roles` | RBAC catalog | In progress |
-| `users` | System users | In progress |
-| `subcities` | Operational geography | In progress |
-| `officer_assignments` | User-to-subcity assignments | In progress |
-| `violation_rules` | Enforceable rule definitions and penalties | In progress |
-| `violations` | Primary violation records | In progress |
-| `violation_evidence` | Evidence metadata and storage keys | In progress |
-| `violation_alerts` | Alert bundles per violation | In progress |
-| `alert_recipients` | Recipient state for alerts | In progress |
-| `complaints` | Complaint cases | In progress |
-| `complaint_decisions` | Complaint outcomes | In progress |
-| `payment_requests` | Payment issuance records | In progress |
-| `payment_transactions` | Callback and settlement events | In progress |
-| `audit_logs` | Immutable activity trail | In progress |
-| `outbox_events` | Worker-driven event handoff | In progress |
-| `sessions` | Cookie session persistence | In progress |
+| `roles` | RBAC catalog | Complete |
+| `users` | System users | Complete |
+| `subcities` | Operational geography | Complete |
+| `officer_assignments` | User-to-subcity assignments | Complete |
+| `violation_rules` | Enforceable rule definitions and penalties | Complete |
+| `violations` | Primary violation records | Complete |
+| `violation_evidence` | Evidence metadata and storage keys | Complete |
+| `violation_alerts` | Alert bundles per violation | Complete |
+| `alert_recipients` | Recipient state for alerts | Complete |
+| `complaints` | Complaint cases | Complete |
+| `complaint_decisions` | Complaint outcomes | Complete |
+| `payment_requests` | Payment issuance records | Complete |
+| `payment_transactions` | Callback and settlement events | Complete |
+| `audit_logs` | Immutable activity trail | Complete |
+| `outbox_events` | Worker-driven event handoff | Complete |
+| `sessions` | Cookie session persistence | Complete |
 
 ## 9. API endpoint checklist
 
 | Route group | Minimum endpoints | Status |
 | --- | --- | --- |
-| `/auth` | login, logout, session redirect | In progress |
-| `/violations` | list, create, detail, stop outcome | In progress |
-| `/alerts` | list, acknowledge | In progress |
-| `/complaints` | list, decision | In progress |
-| `/payments` | list, request, callback simulation | In progress |
-| `/admin` | dashboard, users, rules, audit summary | In progress |
-| `/health` | live and ready probes | In progress |
+| `/auth` | login, logout, session redirect | Complete |
+| `/violations` | list, create, detail, stop outcome, evidence download | Complete |
+| `/alerts` | list, acknowledge | Complete |
+| `/complaints` | list, decision | Complete |
+| `/payments` | list, simulate, gateway callback (HMAC-verified) | Complete |
+| `/admin` | dashboard, audit summary | Complete |
+| `/health` | live and ready probes | Complete |
 
 ## 10. UI screen checklist
 
 | Screen | Audience | Status |
 | --- | --- | --- |
-| Login | All authenticated users | In progress |
-| Officer home | Traffic officer | In progress |
-| Violation report form | Traffic officer | In progress |
-| Alert inbox | Traffic officer / subcity officer | In progress |
-| Complaint queue | Complaint officer | In progress |
-| Payment queue | Complaint officer / admin | In progress |
-| Admin dashboard | System administrator | In progress |
-| Audit summary | System administrator | In progress |
+| Login | All authenticated users | Complete |
+| Officer home | Traffic officer | Complete |
+| Violation report form | Traffic officer | Complete |
+| Alert inbox | Traffic officer / subcity officer | Complete |
+| Complaint queue | Complaint officer | Complete |
+| Payment queue | Complaint officer / admin | Complete |
+| Admin dashboard | System administrator | Complete |
+| Audit summary | System administrator | Complete |
 
 ## 11. Test execution log
 
@@ -205,6 +205,7 @@
 | 2026-04-29 | Repository formalization and Docker-first implementation approved |
 | 2026-04-29 | FastAPI app, worker, Alembic baseline, seeds, vendor assets, and tests added |
 | 2026-04-29 | Docker runtime, Supabase storage, smoke, and backup/restore validation completed |
+| 2026-04-29 | Tracker reconciled: schema, endpoint, and UI checklists marked Complete to match shipped state |
 
 ## 15. Deployment readiness gate
 
