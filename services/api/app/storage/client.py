@@ -31,7 +31,7 @@ class StorageClient:
         )
         if lookup.status_code == 200:
             return
-        if lookup.status_code != 404:
+        if lookup.status_code != 404 and not self._is_bucket_not_found(lookup):
             lookup.raise_for_status()
 
         payload = {
@@ -63,6 +63,20 @@ class StorageClient:
             return True
         nested = payload.get("originalError")
         return isinstance(nested, dict) and nested.get("code") == "BucketAlreadyExists"
+
+    @staticmethod
+    def _is_bucket_not_found(response: httpx.Response) -> bool:
+        if response.status_code not in (400, 404):
+            return False
+        try:
+            payload = response.json()
+        except ValueError:
+            return False
+        if payload.get("statusCode") in ("404", 404):
+            return True
+        if payload.get("code") == "BucketNotFound":
+            return True
+        return payload.get("error") == "Bucket not found"
 
     def upload(self, *, object_path: str, content: bytes, content_type: str) -> StoredEvidence:
         digest = hashlib.sha256(content).hexdigest()

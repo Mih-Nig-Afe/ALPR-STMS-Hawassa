@@ -40,3 +40,5 @@ All notable changes to this repository will be documented in this file.
 ### Fixed
 
 - `joinedload` queries against collection relationships in `/violations`, `/violations/{id}`, `/complaints`, and `/payments` now call `.unique()` on the result, fixing a latent SQLAlchemy `InvalidRequestError` raised when the routes returned violations, complaints, or payment requests with eager-loaded child rows
+- `StorageClient.ensure_bucket` now recognises `supabase/storage-api` returning HTTP 400 with body `{"statusCode":"404","error":"Bucket not found"}` as a missing-bucket signal, so the bootstrap and runtime smoke create the evidence bucket on first boot instead of crashing with a 400
+- `infra/deploy/scripts/backup-restore-smoke.sh` now calls `pg_restore --no-acl --no-owner` so the disposable validation database tolerates GRANTs against extension-provided functions (e.g. `graphql_public.graphql`) that are not pre-installed in the throwaway DB; the structural table-count check remains the success signal

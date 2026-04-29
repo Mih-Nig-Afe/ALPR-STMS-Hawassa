@@ -179,6 +179,8 @@
 | 2026-04-29 | End-to-end HTTP lifecycle | Complete | `docker compose run --rm api pytest tests/e2e tests/unit tests/integration` passed with 37 tests, including the lifecycle test that drives officer login, violation submission, alert acknowledgement, dispute, complaint confirmation, and signed gateway payment callback |
 | 2026-04-29 | Lint and format gate | Complete | `docker compose run --rm api ruff check services tests` and `ruff format --check services tests` both clean across the entire codebase after `pyproject.toml` `flake8-bugbear` exemption for FastAPI dependency-injection helpers and project line-length raised to 120 |
 | 2026-04-29 | CI workflow live | Complete | `.github/workflows/ci.yml` orchestrates `ruff check`, `ruff format --check`, and the full `pytest` suite (unit + integration + e2e) inside the project's Docker Compose stack on every push to `main` and every pull request |
+| 2026-04-29 | Documentation gate | Complete | `docs/api/endpoints.md` enumerates every Phase 1 route and workflow state machine; `docs/integrations/payment-callback.md` defines the gateway contract; `infra/deploy/docs/docker-operations.md` carries a full single-host production runbook (host prep, secrets, TLS, first boot, backups, monitoring, upgrades, rollback) |
+| 2026-04-29 | Final validation gate | Complete | All four readiness gates re-run on a clean host: `pytest tests/unit tests/integration tests/e2e` reports 37 passed; `ruff check` and `ruff format --check` are clean; `make smoke` passes (api liveness, readiness, storage status, evidence upload + download); `make backup-smoke` restored 27 public/storage tables from a fresh dump |
 
 ## 12. Risk and blocker register
 
@@ -215,6 +217,8 @@
 | 2026-04-29 | Test coverage expanded to 36 passing tests covering RBAC, audit, payment gateway, worker, full workflow state machine, callback verification, and routes |
 | 2026-04-29 | End-to-end HTTP lifecycle test added; latent SQLAlchemy `InvalidRequestError` fixed in violations, complaints, and payments list/detail routes (added `.unique()` to joined-collection queries) |
 | 2026-04-29 | Codebase reformatted with `ruff format`; ruff configured for FastAPI dependency-injection pattern; `.github/workflows/ci.yml` added as the CI quality gate (lint + format + full pytest in Docker Compose) |
+| 2026-04-29 | Phase 1 documentation set finalized: `docs/api/endpoints.md` API reference and production deployment runbook in `infra/deploy/docs/docker-operations.md`; README links updated |
+| 2026-04-29 | Storage client `ensure_bucket` hardened to recognise `supabase/storage-api` returning HTTP 400 with body `{statusCode:"404",error:"Bucket not found"}` so the bootstrap and runtime smoke create the bucket on first boot; `infra/deploy/scripts/backup-restore-smoke.sh` switched to `pg_restore --no-acl --no-owner` so the disposable validation database tolerates GRANTs against extension functions that are not pre-installed |
 
 ## 15. Deployment readiness gate
 

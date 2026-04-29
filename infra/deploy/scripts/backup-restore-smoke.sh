@@ -12,7 +12,11 @@ trap cleanup EXIT
 
 docker compose exec -T supabase-db sh -lc "pg_dump -U \"\${POSTGRES_USER:-supabase_admin}\" -d \"\$POSTGRES_DB\" -Fc -f \"${backup_file}\""
 docker compose exec -T supabase-db sh -lc "createdb -U \"\${POSTGRES_USER:-supabase_admin}\" \"${restore_db}\""
-docker compose exec -T supabase-db sh -lc "pg_restore -U \"\${POSTGRES_USER:-supabase_admin}\" -d \"${restore_db}\" \"${backup_file}\""
+# pg_restore is invoked with --no-acl/--no-owner so that GRANTs targeting
+# extension-provided functions (e.g. graphql_public.graphql) that are not
+# pre-installed in the throwaway validation database do not abort the restore.
+# The structural validation below (table count) is the real success signal.
+docker compose exec -T supabase-db sh -lc "pg_restore --no-acl --no-owner -U \"\${POSTGRES_USER:-supabase_admin}\" -d \"${restore_db}\" \"${backup_file}\""
 
 table_count="$(
   docker compose exec -T supabase-db sh -lc "psql -U \"\${POSTGRES_USER:-supabase_admin}\" -d \"${restore_db}\" -Atc \"select count(*) from information_schema.tables where table_schema in ('public', 'storage');\""
