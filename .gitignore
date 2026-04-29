@@ -46,6 +46,10 @@ logs/
 # Local env
 .env
 .env.*
+# But keep the committed example templates
+!.env.example
+!.env.staging.example
+!.env.production.example
 
 # Infrastructure
 .terraform/
