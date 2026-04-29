@@ -132,12 +132,10 @@ services:
       PGRST_DB_USE_LEGACY_GUCS: "false"
       PGRST_APP_SETTINGS_JWT_SECRET: ${JWT_SECRET}
       PGRST_APP_SETTINGS_JWT_EXP: ${JWT_EXPIRY}
-    healthcheck:
-      test:
-        ["CMD", "/usr/bin/sh", "-c", "read -r comm < /proc/1/comm && [ \"$$comm\" = \"postgrest\" ]"]
-      interval: 10s
-      timeout: 5s
-      retries: 6
+    # NOTE: postgrest/postgrest:v14 ships as a scratch image with only the
+    # postgrest binary, so no `sh`/`wget`/`curl` is available for an in-container
+    # healthcheck. Downstream services use service_started; the storage and api
+    # services have their own healthchecks that exercise the rest layer in turn.
 
   supabase-storage:
     container_name: supabase-storage
@@ -147,7 +145,7 @@ services:
       supabase-db:
         condition: service_healthy
       supabase-rest:
-        condition: service_healthy
+        condition: service_started
       supabase-imgproxy:
         condition: service_started
     environment:
