@@ -32,7 +32,7 @@ addopts = "-q"
 testpaths = ["tests"]
 
 [tool.ruff]
-line-length = 100
+line-length = 120
 target-version = "py312"
 src = ["services/api", "services/worker", "packages/shared", "tests"]
 
@@ -43,6 +43,23 @@ select = [
   "I",
   "B",
   "UP",
+]
+
+[tool.ruff.lint.flake8-bugbear]
+# FastAPI's documented dependency-injection pattern relies on calling Depends(),
+# Query(), Header(), etc. in argument defaults. Exempt these calls from B008.
+extend-immutable-calls = [
+  "fastapi.Depends",
+  "fastapi.Query",
+  "fastapi.Header",
+  "fastapi.Path",
+  "fastapi.Body",
+  "fastapi.Form",
+  "fastapi.File",
+  "fastapi.Cookie",
+  "fastapi.Security",
+  "app.auth.dependencies.require_roles",
+  "app.auth.dependencies.require_user",
 ]
 
 [tool.ruff.format]

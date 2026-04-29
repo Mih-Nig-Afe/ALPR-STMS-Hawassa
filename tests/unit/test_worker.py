@@ -44,9 +44,7 @@ def test_process_batch_marks_pending_event_delivered(pending_outbox_event) -> No
     assert processed >= 1
     factory = get_session_factory()
     with factory() as db:
-        event = db.execute(
-            select(OutboxEvent).where(OutboxEvent.id == pending_outbox_event)
-        ).scalars().one()
+        event = db.execute(select(OutboxEvent).where(OutboxEvent.id == pending_outbox_event)).scalars().one()
         assert event.status == OUTBOX_STATUS_DELIVERED
         assert event.attempts == 1
         assert event.processed_at is not None
@@ -72,9 +70,7 @@ def test_process_batch_skips_future_available_events() -> None:
     try:
         process_batch()
         with factory() as db:
-            event = db.execute(
-                select(OutboxEvent).where(OutboxEvent.id == event_id)
-            ).scalars().one()
+            event = db.execute(select(OutboxEvent).where(OutboxEvent.id == event_id)).scalars().one()
             assert event.status == OUTBOX_STATUS_PENDING
             assert event.attempts == 0
     finally:

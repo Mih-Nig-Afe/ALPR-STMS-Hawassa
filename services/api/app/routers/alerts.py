@@ -12,7 +12,6 @@ from app.db.session import get_db
 from app.models.domain import AlertRecipient, User, ViolationAlert
 from app.services.workflows import acknowledge_alert
 
-
 router = APIRouter(prefix="/alerts", tags=["alerts"])
 
 
@@ -24,13 +23,20 @@ def alerts_page(
 ):
     query = (
         select(AlertRecipient)
-        .options(joinedload(AlertRecipient.alert).joinedload(ViolationAlert.violation), joinedload(AlertRecipient.user))
+        .options(
+            joinedload(AlertRecipient.alert).joinedload(ViolationAlert.violation),
+            joinedload(AlertRecipient.user),
+        )
         .order_by(AlertRecipient.created_at.desc())
     )
     if current_user.role.code != ROLE_SYSTEM_ADMIN:
         query = query.where(AlertRecipient.user_id == current_user.id)
     recipients = db.execute(query).scalars().all()
-    return templates.TemplateResponse(request, "alerts/index.html", {"current_user": current_user, "recipients": recipients})
+    return templates.TemplateResponse(
+        request,
+        "alerts/index.html",
+        {"current_user": current_user, "recipients": recipients},
+    )
 
 
 @router.post("/{recipient_id}/ack")

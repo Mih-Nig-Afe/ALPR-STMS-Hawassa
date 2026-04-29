@@ -49,14 +49,12 @@ def seeded_payment_request():
     violation_id: str | None = None
 
     with factory() as db:
-        rule = db.execute(
-            select(ViolationRule).where(ViolationRule.is_active.is_(True))
-        ).scalars().first()
-        officer = db.execute(
-            select(User)
-            .join(Role, User.role_id == Role.id)
-            .where(Role.code == ROLE_TRAFFIC_OFFICER)
-        ).scalars().first()
+        rule = db.execute(select(ViolationRule).where(ViolationRule.is_active.is_(True))).scalars().first()
+        officer = (
+            db.execute(select(User).join(Role, User.role_id == Role.id).where(Role.code == ROLE_TRAFFIC_OFFICER))
+            .scalars()
+            .first()
+        )
         if rule is None or officer is None:
             pytest.skip("Seed data missing required rule or officer")
 
@@ -100,19 +98,13 @@ def seeded_payment_request():
     }
 
     with factory() as db:
-        db.execute(
-            PaymentTransaction.__table__.delete().where(
-                PaymentTransaction.payment_request_id == payment_id
-            )
-        )
+        db.execute(PaymentTransaction.__table__.delete().where(PaymentTransaction.payment_request_id == payment_id))
         db.execute(AuditLog.__table__.delete().where(AuditLog.entity_id == payment_id))
         for event in db.execute(select(OutboxEvent)).scalars():
             payload = event.payload or {}
             if payload.get("payment_request_id") == payment_id:
                 db.delete(event)
-        db.execute(
-            PaymentRequest.__table__.delete().where(PaymentRequest.id == payment_id)
-        )
+        db.execute(PaymentRequest.__table__.delete().where(PaymentRequest.id == payment_id))
         db.execute(Violation.__table__.delete().where(Violation.id == violation_id))
         db.commit()
 

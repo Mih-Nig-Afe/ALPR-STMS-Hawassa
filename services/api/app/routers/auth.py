@@ -13,7 +13,6 @@ from app.db.session import get_db
 from app.models.domain import User
 from app.services.auth import authenticate_user, create_session, delete_session
 
-
 router = APIRouter(prefix="/auth", tags=["auth"])
 
 

@@ -1,4 +1,5 @@
 """End-to-end test driving the full violation lifecycle through the HTTP API."""
+
 from __future__ import annotations
 
 import json
@@ -54,54 +55,27 @@ def _cleanup_violation(violation_id: str) -> None:
     with factory() as db:
         payment_ids = [
             row[0]
-            for row in db.execute(
-                select(PaymentRequest.id).where(PaymentRequest.violation_id == violation_id)
-            ).all()
+            for row in db.execute(select(PaymentRequest.id).where(PaymentRequest.violation_id == violation_id)).all()
         ]
         for pid in payment_ids:
-            db.execute(
-                PaymentTransaction.__table__.delete().where(
-                    PaymentTransaction.payment_request_id == pid
-                )
-            )
+            db.execute(PaymentTransaction.__table__.delete().where(PaymentTransaction.payment_request_id == pid))
             db.execute(AuditLog.__table__.delete().where(AuditLog.entity_id == pid))
-        db.execute(
-            PaymentRequest.__table__.delete().where(
-                PaymentRequest.violation_id == violation_id
-            )
-        )
+        db.execute(PaymentRequest.__table__.delete().where(PaymentRequest.violation_id == violation_id))
         complaint_ids = [
-            row[0]
-            for row in db.execute(
-                select(Complaint.id).where(Complaint.violation_id == violation_id)
-            ).all()
+            row[0] for row in db.execute(select(Complaint.id).where(Complaint.violation_id == violation_id)).all()
         ]
         for cid in complaint_ids:
-            db.execute(
-                ComplaintDecision.__table__.delete().where(
-                    ComplaintDecision.complaint_id == cid
-                )
-            )
+            db.execute(ComplaintDecision.__table__.delete().where(ComplaintDecision.complaint_id == cid))
             db.execute(AuditLog.__table__.delete().where(AuditLog.entity_id == cid))
-        db.execute(
-            Complaint.__table__.delete().where(Complaint.violation_id == violation_id)
-        )
+        db.execute(Complaint.__table__.delete().where(Complaint.violation_id == violation_id))
         alert_ids = [
             row[0]
-            for row in db.execute(
-                select(ViolationAlert.id).where(ViolationAlert.violation_id == violation_id)
-            ).all()
+            for row in db.execute(select(ViolationAlert.id).where(ViolationAlert.violation_id == violation_id)).all()
         ]
         for aid in alert_ids:
             db.execute(AlertRecipient.__table__.delete().where(AlertRecipient.alert_id == aid))
-        db.execute(
-            ViolationAlert.__table__.delete().where(ViolationAlert.violation_id == violation_id)
-        )
-        db.execute(
-            ViolationEvidence.__table__.delete().where(
-                ViolationEvidence.violation_id == violation_id
-            )
-        )
+        db.execute(ViolationAlert.__table__.delete().where(ViolationAlert.violation_id == violation_id))
+        db.execute(ViolationEvidence.__table__.delete().where(ViolationEvidence.violation_id == violation_id))
         db.execute(AuditLog.__table__.delete().where(AuditLog.entity_id == violation_id))
         for event in db.execute(select(OutboxEvent)).scalars():
             payload = event.payload or {}
@@ -116,9 +90,7 @@ def lifecycle_context():
     settings = get_settings()
     factory = get_session_factory()
     with factory() as db:
-        rule = db.execute(
-            select(ViolationRule).where(ViolationRule.is_active.is_(True))
-        ).scalars().first()
+        rule = db.execute(select(ViolationRule).where(ViolationRule.is_active.is_(True))).scalars().first()
         if rule is None:
             pytest.skip("Seed data missing: no active violation rule")
         rule_id = rule.id
@@ -173,16 +145,11 @@ def test_full_violation_lifecycle_through_http(lifecycle_context) -> None:
         # 3. Subcity officer logs in, sees the alert, and acknowledges it
         factory = get_session_factory()
         with factory() as db:
-            alert = db.execute(
-                select(ViolationAlert).where(ViolationAlert.violation_id == violation_id)
-            ).scalars().one()
-            recipients = db.execute(
-                select(AlertRecipient).where(AlertRecipient.alert_id == alert.id)
-            ).scalars().all()
-            subcity_recipient = next(
-                r for r in recipients
-                if db.get(User, r.user_id).username == "subcity.central"
+            alert = (
+                db.execute(select(ViolationAlert).where(ViolationAlert.violation_id == violation_id)).scalars().one()
             )
+            recipients = db.execute(select(AlertRecipient).where(AlertRecipient.alert_id == alert.id)).scalars().all()
+            subcity_recipient = next(r for r in recipients if db.get(User, r.user_id).username == "subcity.central")
             recipient_id = subcity_recipient.id
         _login(client, "subcity.central", settings.subcity_default_password)
         ack = client.post(f"/alerts/{recipient_id}/ack", follow_redirects=False)
@@ -199,9 +166,7 @@ def test_full_violation_lifecycle_through_http(lifecycle_context) -> None:
         with factory() as db:
             violation = db.get(Violation, violation_id)
             assert violation.status == VIOLATION_STATUS_UNDER_COMPLAINT
-            complaint = db.execute(
-                select(Complaint).where(Complaint.violation_id == violation_id)
-            ).scalars().one()
+            complaint = db.execute(select(Complaint).where(Complaint.violation_id == violation_id)).scalars().one()
             complaint_id = complaint.id
 
         # 5. Complaint officer logs in and confirms the complaint
@@ -215,9 +180,9 @@ def test_full_violation_lifecycle_through_http(lifecycle_context) -> None:
         with factory() as db:
             violation = db.get(Violation, violation_id)
             assert violation.status == VIOLATION_STATUS_PAYMENT_PENDING
-            payment_request = db.execute(
-                select(PaymentRequest).where(PaymentRequest.violation_id == violation_id)
-            ).scalars().one()
+            payment_request = (
+                db.execute(select(PaymentRequest).where(PaymentRequest.violation_id == violation_id)).scalars().one()
+            )
             payment_reference = payment_request.reference_code
 
         # 6. External payment gateway calls the signed callback to settle
@@ -229,9 +194,7 @@ def test_full_violation_lifecycle_through_http(lifecycle_context) -> None:
         }
         raw = json.dumps(body).encode("utf-8")
         timestamp = int(time.time())
-        signature = compute_signature(
-            settings.payment_callback_shared_secret, timestamp, raw
-        )
+        signature = compute_signature(settings.payment_callback_shared_secret, timestamp, raw)
         callback = client.post(
             "/payments/callback",
             content=raw,

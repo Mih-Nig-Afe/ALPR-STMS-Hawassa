@@ -19,7 +19,6 @@ from app.db.session import get_session_factory
 from app.models.domain import OfficerAssignment, Role, Subcity, User, ViolationRule
 from app.storage.client import StorageClient
 
-
 ROOT = Path(__file__).resolve().parents[3]
 SEED_DIR = ROOT / "data" / "seed" / "json"
 

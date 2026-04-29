@@ -15,7 +15,6 @@ from app.models.domain import User, Violation, ViolationEvidence, ViolationRule
 from app.services.workflows import ViolationInput, apply_stop_outcome, create_violation
 from app.storage.client import StorageClient
 
-
 router = APIRouter(prefix="/violations", tags=["violations"])
 
 
@@ -25,7 +24,11 @@ def violations_page(
     current_user: User = Depends(require_roles(ROLE_TRAFFIC_OFFICER, ROLE_SYSTEM_ADMIN)),
     db: Session = Depends(get_db),
 ):
-    rules = db.execute(select(ViolationRule).where(ViolationRule.is_active.is_(True)).order_by(ViolationRule.name)).scalars().all()
+    rules = (
+        db.execute(select(ViolationRule).where(ViolationRule.is_active.is_(True)).order_by(ViolationRule.name))
+        .scalars()
+        .all()
+    )
     violations = (
         db.execute(
             select(Violation)
@@ -113,7 +116,11 @@ def violation_detail(
     )
     if violation is None:
         raise HTTPException(status_code=404, detail="Violation not found")
-    return templates.TemplateResponse(request, "violations/detail.html", {"current_user": current_user, "violation": violation})
+    return templates.TemplateResponse(
+        request,
+        "violations/detail.html",
+        {"current_user": current_user, "violation": violation},
+    )
 
 
 @router.post("/{violation_id}/stop-outcome")
@@ -124,7 +131,13 @@ def stop_outcome_submit(
     current_user: User = Depends(require_user),
     db: Session = Depends(get_db),
 ):
-    apply_stop_outcome(db, actor=current_user, violation_id=violation_id, outcome=outcome, notes=notes)
+    apply_stop_outcome(
+        db,
+        actor=current_user,
+        violation_id=violation_id,
+        outcome=outcome,
+        notes=notes,
+    )
     params = urlencode({"notice": "Stop outcome recorded", "notice_level": "success"})
     return RedirectResponse(f"/violations/{violation_id}?{params}", status_code=303)
 

@@ -60,7 +60,10 @@ def get_user_by_session_token(db: Session, token: str) -> User | None:
     session_record = (
         db.execute(
             select(SessionModel)
-            .options(joinedload(SessionModel.user).joinedload(User.role), joinedload(SessionModel.user).joinedload(User.default_subcity))
+            .options(
+                joinedload(SessionModel.user).joinedload(User.role),
+                joinedload(SessionModel.user).joinedload(User.default_subcity),
+            )
             .where(SessionModel.token_hash == hash_session_token(token))
         )
         .scalars()
@@ -75,9 +78,7 @@ def get_user_by_session_token(db: Session, token: str) -> User | None:
 
 def delete_session(db: Session, token: str) -> None:
     session_record = (
-        db.execute(select(SessionModel).where(SessionModel.token_hash == hash_session_token(token)))
-        .scalars()
-        .first()
+        db.execute(select(SessionModel).where(SessionModel.token_hash == hash_session_token(token))).scalars().first()
     )
     if session_record:
         db.delete(session_record)

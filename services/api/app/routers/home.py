@@ -17,7 +17,6 @@ from app.db.session import get_db
 from app.models.domain import User
 from app.storage.client import StorageClient
 
-
 router = APIRouter()
 
 

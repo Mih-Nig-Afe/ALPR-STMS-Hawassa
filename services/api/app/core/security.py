@@ -1,16 +1,15 @@
 import hashlib
 import hmac
 import secrets
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 from app.core.config import get_settings
-
 
 PBKDF2_ROUNDS = 390000
 
 
 def utcnow() -> datetime:
-    return datetime.now(timezone.utc)
+    return datetime.now(UTC)
 
 
 def hash_password(password: str) -> str:
@@ -43,10 +42,9 @@ def create_session_token() -> str:
 
 def hash_session_token(token: str) -> str:
     secret = get_settings().app_secret_key
-    return hashlib.sha256(f"{secret}:{token}".encode("utf-8")).hexdigest()
+    return hashlib.sha256(f"{secret}:{token}".encode()).hexdigest()
 
 
 def session_expiry() -> datetime:
     settings = get_settings()
     return utcnow() + timedelta(hours=settings.session_ttl_hours)
-

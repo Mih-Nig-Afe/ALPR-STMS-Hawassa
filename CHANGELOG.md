@@ -27,6 +27,12 @@ All notable changes to this repository will be documented in this file.
 - Integration tests for the full violation lifecycle: report -> broadcast -> acknowledge -> stop outcome (admitted/disputed) -> complaint decide (confirm/revoke) -> simulated payment settlement
 - Test suite expanded from 7 to 36 passing tests against the live Docker stack
 - End-to-end test `tests/e2e/test_violation_lifecycle.py` that drives the full lifecycle through the HTTP API: officer login -> violation submission -> alert acknowledgement -> stop dispute -> complaint confirmation -> signed gateway payment callback -> paid state assertion
+- `.github/workflows/ci.yml` GitHub Actions workflow that runs `ruff check`, `ruff format --check`, and the full `pytest` suite (unit + integration + e2e) inside the project's Docker Compose stack on every push to `main` and on every pull request
+
+### Changed
+
+- `pyproject.toml` ruff configuration: line length raised from 100 to 120 (modern industry standard), `flake8-bugbear` extended-immutable-calls list now exempts the FastAPI dependency-injection helpers (`Depends`, `Query`, `Header`, `Path`, `Body`, `Form`, `File`, `Cookie`, `Security`) and the project's own `require_user` / `require_roles` factories so the canonical FastAPI pattern stops triggering `B008`
+- Entire `services/` and `tests/` trees reformatted by `ruff format` for consistency; `ruff check services tests` now reports zero issues
 
 ### Fixed
 

@@ -14,7 +14,6 @@ from app.db.session import get_db
 from app.models.domain import Complaint, User, Violation
 from app.services.workflows import decide_complaint
 
-
 router = APIRouter(prefix="/complaints", tags=["complaints"])
 
 
@@ -38,7 +37,11 @@ def complaints_page(
         .scalars()
         .all()
     )
-    return templates.TemplateResponse(request, "complaints/index.html", {"current_user": current_user, "complaints": complaints})
+    return templates.TemplateResponse(
+        request,
+        "complaints/index.html",
+        {"current_user": current_user, "complaints": complaints},
+    )
 
 
 @router.post("/{complaint_id}/decision")
@@ -49,6 +52,12 @@ def complaint_decision_submit(
     current_user: User = Depends(require_roles(ROLE_COMPLAINT_OFFICER, ROLE_SYSTEM_ADMIN)),
     db: Session = Depends(get_db),
 ):
-    decide_complaint(db, actor=current_user, complaint_id=complaint_id, decision=decision, notes=notes)
+    decide_complaint(
+        db,
+        actor=current_user,
+        complaint_id=complaint_id,
+        decision=decision,
+        notes=notes,
+    )
     params = urlencode({"notice": "Complaint decision recorded", "notice_level": "success"})
     return RedirectResponse(f"/complaints?{params}", status_code=303)

@@ -2,9 +2,9 @@ from __future__ import annotations
 
 from datetime import datetime
 from decimal import Decimal
-from typing import Any, Optional
+from typing import Any
 
-from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, JSON, Numeric, String, Text
+from sqlalchemy import JSON, Boolean, DateTime, ForeignKey, Integer, Numeric, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.security import utcnow
@@ -19,7 +19,7 @@ class Role(Base):
     name: Mapped[str] = mapped_column(String(128), nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow, nullable=False)
 
-    users: Mapped[list["User"]] = relationship(back_populates="role")
+    users: Mapped[list[User]] = relationship(back_populates="role")
 
 
 class Subcity(Base):
@@ -31,8 +31,8 @@ class Subcity(Base):
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow, nullable=False)
 
-    users: Mapped[list["User"]] = relationship(back_populates="default_subcity")
-    assignments: Mapped[list["OfficerAssignment"]] = relationship(back_populates="subcity")
+    users: Mapped[list[User]] = relationship(back_populates="default_subcity")
+    assignments: Mapped[list[OfficerAssignment]] = relationship(back_populates="subcity")
 
 
 class User(Base):
@@ -41,17 +41,17 @@ class User(Base):
     id: Mapped[str] = mapped_column(String(36), primary_key=True)
     username: Mapped[str] = mapped_column(String(64), unique=True, nullable=False)
     full_name: Mapped[str] = mapped_column(String(128), nullable=False)
-    email: Mapped[Optional[str]] = mapped_column(String(255))
-    phone_number: Mapped[Optional[str]] = mapped_column(String(32))
+    email: Mapped[str | None] = mapped_column(String(255))
+    phone_number: Mapped[str | None] = mapped_column(String(32))
     password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
     role_id: Mapped[str] = mapped_column(ForeignKey("roles.id"), nullable=False)
-    default_subcity_id: Mapped[Optional[str]] = mapped_column(ForeignKey("subcities.id"))
+    default_subcity_id: Mapped[str | None] = mapped_column(ForeignKey("subcities.id"))
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow, nullable=False)
 
     role: Mapped[Role] = relationship(back_populates="users")
-    default_subcity: Mapped[Optional[Subcity]] = relationship(back_populates="users")
-    assignments: Mapped[list["OfficerAssignment"]] = relationship(back_populates="user")
+    default_subcity: Mapped[Subcity | None] = relationship(back_populates="users")
+    assignments: Mapped[list[OfficerAssignment]] = relationship(back_populates="user")
 
 
 class OfficerAssignment(Base):
@@ -90,14 +90,14 @@ class Violation(Base):
     reporting_officer_id: Mapped[str] = mapped_column(ForeignKey("users.id"), nullable=False)
     subcity_id: Mapped[str] = mapped_column(ForeignKey("subcities.id"), nullable=False)
     vehicle_plate: Mapped[str] = mapped_column(String(32), nullable=False)
-    driver_phone_number: Mapped[Optional[str]] = mapped_column(String(32))
+    driver_phone_number: Mapped[str | None] = mapped_column(String(32))
     status: Mapped[str] = mapped_column(String(64), nullable=False)
     draft_penalty_amount: Mapped[Decimal] = mapped_column(Numeric(10, 2), nullable=False)
     location_text: Mapped[str] = mapped_column(String(255), nullable=False)
-    latitude: Mapped[Optional[str]] = mapped_column(String(64))
-    longitude: Mapped[Optional[str]] = mapped_column(String(64))
-    escape_path_geojson: Mapped[Optional[dict[str, Any]]] = mapped_column(JSON)
-    notes: Mapped[Optional[str]] = mapped_column(Text)
+    latitude: Mapped[str | None] = mapped_column(String(64))
+    longitude: Mapped[str | None] = mapped_column(String(64))
+    escape_path_geojson: Mapped[dict[str, Any] | None] = mapped_column(JSON)
+    notes: Mapped[str | None] = mapped_column(Text)
     reported_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow, nullable=False)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow, onupdate=utcnow)
@@ -105,10 +105,10 @@ class Violation(Base):
     rule: Mapped[ViolationRule] = relationship()
     reporting_officer: Mapped[User] = relationship()
     subcity: Mapped[Subcity] = relationship()
-    evidence_items: Mapped[list["ViolationEvidence"]] = relationship(back_populates="violation")
-    alerts: Mapped[list["ViolationAlert"]] = relationship(back_populates="violation")
-    complaints: Mapped[list["Complaint"]] = relationship(back_populates="violation")
-    payment_requests: Mapped[list["PaymentRequest"]] = relationship(back_populates="violation")
+    evidence_items: Mapped[list[ViolationEvidence]] = relationship(back_populates="violation")
+    alerts: Mapped[list[ViolationAlert]] = relationship(back_populates="violation")
+    complaints: Mapped[list[Complaint]] = relationship(back_populates="violation")
+    payment_requests: Mapped[list[PaymentRequest]] = relationship(back_populates="violation")
 
 
 class ViolationEvidence(Base):
@@ -137,7 +137,7 @@ class ViolationAlert(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow, nullable=False)
 
     violation: Mapped[Violation] = relationship(back_populates="alerts")
-    recipients: Mapped[list["AlertRecipient"]] = relationship(back_populates="alert")
+    recipients: Mapped[list[AlertRecipient]] = relationship(back_populates="alert")
 
 
 class AlertRecipient(Base):
@@ -147,7 +147,7 @@ class AlertRecipient(Base):
     alert_id: Mapped[str] = mapped_column(ForeignKey("violation_alerts.id"), nullable=False)
     user_id: Mapped[str] = mapped_column(ForeignKey("users.id"), nullable=False)
     status: Mapped[str] = mapped_column(String(64), nullable=False)
-    acknowledged_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True))
+    acknowledged_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow, nullable=False)
 
     alert: Mapped[ViolationAlert] = relationship(back_populates="recipients")
@@ -165,7 +165,7 @@ class Complaint(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow, nullable=False)
 
     violation: Mapped[Violation] = relationship(back_populates="complaints")
-    decisions: Mapped[list["ComplaintDecision"]] = relationship(back_populates="complaint")
+    decisions: Mapped[list[ComplaintDecision]] = relationship(back_populates="complaint")
 
 
 class ComplaintDecision(Base):
@@ -175,7 +175,7 @@ class ComplaintDecision(Base):
     complaint_id: Mapped[str] = mapped_column(ForeignKey("complaints.id"), nullable=False)
     decided_by_user_id: Mapped[str] = mapped_column(ForeignKey("users.id"), nullable=False)
     decision: Mapped[str] = mapped_column(String(64), nullable=False)
-    notes: Mapped[Optional[str]] = mapped_column(Text)
+    notes: Mapped[str | None] = mapped_column(Text)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow, nullable=False)
 
     complaint: Mapped[Complaint] = relationship(back_populates="decisions")
@@ -193,7 +193,7 @@ class PaymentRequest(Base):
     created_by_user_id: Mapped[str] = mapped_column(ForeignKey("users.id"), nullable=False)
 
     violation: Mapped[Violation] = relationship(back_populates="payment_requests")
-    transactions: Mapped[list["PaymentTransaction"]] = relationship(back_populates="payment_request")
+    transactions: Mapped[list[PaymentTransaction]] = relationship(back_populates="payment_request")
 
 
 class PaymentTransaction(Base):
@@ -203,7 +203,7 @@ class PaymentTransaction(Base):
     payment_request_id: Mapped[str] = mapped_column(ForeignKey("payment_requests.id"), nullable=False)
     provider_reference: Mapped[str] = mapped_column(String(64), nullable=False)
     outcome: Mapped[str] = mapped_column(String(64), nullable=False)
-    payload: Mapped[Optional[dict[str, Any]]] = mapped_column(JSON)
+    payload: Mapped[dict[str, Any] | None] = mapped_column(JSON)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow, nullable=False)
 
     payment_request: Mapped[PaymentRequest] = relationship(back_populates="transactions")
@@ -213,11 +213,11 @@ class AuditLog(Base):
     __tablename__ = "audit_logs"
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True)
-    actor_user_id: Mapped[Optional[str]] = mapped_column(ForeignKey("users.id"))
+    actor_user_id: Mapped[str | None] = mapped_column(ForeignKey("users.id"))
     action: Mapped[str] = mapped_column(String(128), nullable=False)
     entity_type: Mapped[str] = mapped_column(String(64), nullable=False)
     entity_id: Mapped[str] = mapped_column(String(36), nullable=False)
-    details: Mapped[Optional[dict[str, Any]]] = mapped_column(JSON)
+    details: Mapped[dict[str, Any] | None] = mapped_column(JSON)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow, nullable=False)
 
 
@@ -229,9 +229,9 @@ class OutboxEvent(Base):
     payload: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False)
     status: Mapped[str] = mapped_column(String(64), nullable=False)
     attempts: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
-    last_error: Mapped[Optional[str]] = mapped_column(Text)
+    last_error: Mapped[str | None] = mapped_column(Text)
     available_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow, nullable=False)
-    processed_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True))
+    processed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow, nullable=False)
 
 
@@ -242,8 +242,8 @@ class SessionModel(Base):
     user_id: Mapped[str] = mapped_column(ForeignKey("users.id"), nullable=False)
     token_hash: Mapped[str] = mapped_column(String(64), unique=True, nullable=False)
     expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
-    ip_address: Mapped[Optional[str]] = mapped_column(String(64))
-    user_agent: Mapped[Optional[str]] = mapped_column(String(255))
+    ip_address: Mapped[str | None] = mapped_column(String(64))
+    user_agent: Mapped[str | None] = mapped_column(String(255))
     last_seen_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow, nullable=False)
 

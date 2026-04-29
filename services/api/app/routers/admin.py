@@ -8,7 +8,6 @@ from app.core.templating import templates
 from app.db.session import get_db
 from app.models.domain import AuditLog, User, Violation, ViolationRule
 
-
 router = APIRouter(prefix="/admin", tags=["admin"])
 
 

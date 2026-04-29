@@ -45,7 +45,11 @@ def payments_page(
         .scalars()
         .all()
     )
-    return templates.TemplateResponse(request, "payments/index.html", {"current_user": current_user, "payment_requests": payment_requests})
+    return templates.TemplateResponse(
+        request,
+        "payments/index.html",
+        {"current_user": current_user, "payment_requests": payment_requests},
+    )
 
 
 @router.post("/{payment_request_id}/simulate")

@@ -46,61 +46,35 @@ from app.services.workflows import (
 
 
 def _user_with_role(db, code: str):
-    return db.execute(
-        select(User).join(Role, User.role_id == Role.id).where(Role.code == code)
-    ).scalars().first()
+    return db.execute(select(User).join(Role, User.role_id == Role.id).where(Role.code == code)).scalars().first()
 
 
 def _cleanup(violation_id: str) -> None:
     factory = get_session_factory()
     with factory() as db:
         payment_ids = [
-            row[0] for row in db.execute(
-                select(PaymentRequest.id).where(PaymentRequest.violation_id == violation_id)
-            ).all()
+            row[0]
+            for row in db.execute(select(PaymentRequest.id).where(PaymentRequest.violation_id == violation_id)).all()
         ]
         for pid in payment_ids:
-            db.execute(
-                PaymentTransaction.__table__.delete().where(
-                    PaymentTransaction.payment_request_id == pid
-                )
-            )
+            db.execute(PaymentTransaction.__table__.delete().where(PaymentTransaction.payment_request_id == pid))
             db.execute(AuditLog.__table__.delete().where(AuditLog.entity_id == pid))
-        db.execute(
-            PaymentRequest.__table__.delete().where(
-                PaymentRequest.violation_id == violation_id
-            )
-        )
+        db.execute(PaymentRequest.__table__.delete().where(PaymentRequest.violation_id == violation_id))
         complaint_ids = [
-            row[0] for row in db.execute(
-                select(Complaint.id).where(Complaint.violation_id == violation_id)
-            ).all()
+            row[0] for row in db.execute(select(Complaint.id).where(Complaint.violation_id == violation_id)).all()
         ]
         for cid in complaint_ids:
-            db.execute(
-                ComplaintDecision.__table__.delete().where(
-                    ComplaintDecision.complaint_id == cid
-                )
-            )
+            db.execute(ComplaintDecision.__table__.delete().where(ComplaintDecision.complaint_id == cid))
             db.execute(AuditLog.__table__.delete().where(AuditLog.entity_id == cid))
         db.execute(Complaint.__table__.delete().where(Complaint.violation_id == violation_id))
         alert_ids = [
-            row[0] for row in db.execute(
-                select(ViolationAlert.id).where(ViolationAlert.violation_id == violation_id)
-            ).all()
+            row[0]
+            for row in db.execute(select(ViolationAlert.id).where(ViolationAlert.violation_id == violation_id)).all()
         ]
         for aid in alert_ids:
             db.execute(AlertRecipient.__table__.delete().where(AlertRecipient.alert_id == aid))
-        db.execute(
-            ViolationAlert.__table__.delete().where(
-                ViolationAlert.violation_id == violation_id
-            )
-        )
-        db.execute(
-            ViolationEvidence.__table__.delete().where(
-                ViolationEvidence.violation_id == violation_id
-            )
-        )
+        db.execute(ViolationAlert.__table__.delete().where(ViolationAlert.violation_id == violation_id))
+        db.execute(ViolationEvidence.__table__.delete().where(ViolationEvidence.violation_id == violation_id))
         db.execute(AuditLog.__table__.delete().where(AuditLog.entity_id == violation_id))
         for event in db.execute(select(OutboxEvent)).scalars():
             payload = event.payload or {}
@@ -115,9 +89,7 @@ def workflow_world():
     factory = get_session_factory()
     suffix = uuid4().hex[:8]
     with factory() as db:
-        rule = db.execute(
-            select(ViolationRule).where(ViolationRule.is_active.is_(True))
-        ).scalars().first()
+        rule = db.execute(select(ViolationRule).where(ViolationRule.is_active.is_(True))).scalars().first()
         officer = _user_with_role(db, ROLE_TRAFFIC_OFFICER)
         complaint_officer = _user_with_role(db, ROLE_COMPLAINT_OFFICER)
         if rule is None or officer is None or complaint_officer is None:
@@ -169,12 +141,8 @@ def test_create_violation_broadcasts_and_assigns_recipients(workflow_world) -> N
     with factory() as db:
         violation = db.get(Violation, violation_id)
         assert violation.status == VIOLATION_STATUS_BROADCASTED
-        alert = db.execute(
-            select(ViolationAlert).where(ViolationAlert.violation_id == violation_id)
-        ).scalars().one()
-        recipients = db.execute(
-            select(AlertRecipient).where(AlertRecipient.alert_id == alert.id)
-        ).scalars().all()
+        alert = db.execute(select(ViolationAlert).where(ViolationAlert.violation_id == violation_id)).scalars().one()
+        recipients = db.execute(select(AlertRecipient).where(AlertRecipient.alert_id == alert.id)).scalars().all()
         assert recipients, "broadcast must produce at least one recipient"
 
 
@@ -184,12 +152,8 @@ def test_acknowledge_alert_updates_recipient(workflow_world) -> None:
     created.append(violation_id)
     factory = get_session_factory()
     with factory() as db:
-        alert = db.execute(
-            select(ViolationAlert).where(ViolationAlert.violation_id == violation_id)
-        ).scalars().one()
-        recipient = db.execute(
-            select(AlertRecipient).where(AlertRecipient.alert_id == alert.id)
-        ).scalars().first()
+        alert = db.execute(select(ViolationAlert).where(ViolationAlert.violation_id == violation_id)).scalars().one()
+        recipient = db.execute(select(AlertRecipient).where(AlertRecipient.alert_id == alert.id)).scalars().first()
         recipient_user_id = recipient.user_id
         recipient_id = recipient.id
     with factory() as db:
@@ -208,15 +172,13 @@ def test_apply_stop_outcome_admitted_creates_payment_request(workflow_world) -> 
     factory = get_session_factory()
     with factory() as db:
         actor = db.get(User, ids["officer_id"])
-        apply_stop_outcome(
-            db, actor=actor, violation_id=violation_id, outcome="admitted", notes="paid on the spot"
-        )
+        apply_stop_outcome(db, actor=actor, violation_id=violation_id, outcome="admitted", notes="paid on the spot")
     with factory() as db:
         violation = db.get(Violation, violation_id)
         assert violation.status == VIOLATION_STATUS_PAYMENT_PENDING
-        payment_request = db.execute(
-            select(PaymentRequest).where(PaymentRequest.violation_id == violation_id)
-        ).scalars().one()
+        payment_request = (
+            db.execute(select(PaymentRequest).where(PaymentRequest.violation_id == violation_id)).scalars().one()
+        )
         assert payment_request.status == PAYMENT_STATUS_REQUESTED
 
 
@@ -227,15 +189,11 @@ def test_apply_stop_outcome_disputed_opens_complaint(workflow_world) -> None:
     factory = get_session_factory()
     with factory() as db:
         actor = db.get(User, ids["officer_id"])
-        apply_stop_outcome(
-            db, actor=actor, violation_id=violation_id, outcome="disputed", notes="driver disputes"
-        )
+        apply_stop_outcome(db, actor=actor, violation_id=violation_id, outcome="disputed", notes="driver disputes")
     with factory() as db:
         violation = db.get(Violation, violation_id)
         assert violation.status == VIOLATION_STATUS_UNDER_COMPLAINT
-        complaint = db.execute(
-            select(Complaint).where(Complaint.violation_id == violation_id)
-        ).scalars().one()
+        complaint = db.execute(select(Complaint).where(Complaint.violation_id == violation_id)).scalars().one()
         assert complaint.status == "OPEN"
 
 
@@ -246,17 +204,11 @@ def test_decide_complaint_revoke_sets_violation_revoked(workflow_world) -> None:
     factory = get_session_factory()
     with factory() as db:
         actor = db.get(User, ids["officer_id"])
-        apply_stop_outcome(
-            db, actor=actor, violation_id=violation_id, outcome="disputed", notes="dispute"
-        )
-        complaint_id = db.execute(
-            select(Complaint.id).where(Complaint.violation_id == violation_id)
-        ).scalar_one()
+        apply_stop_outcome(db, actor=actor, violation_id=violation_id, outcome="disputed", notes="dispute")
+        complaint_id = db.execute(select(Complaint.id).where(Complaint.violation_id == violation_id)).scalar_one()
     with factory() as db:
         actor = db.get(User, ids["complaint_officer_id"])
-        decide_complaint(
-            db, actor=actor, complaint_id=complaint_id, decision="revoke", notes="not at fault"
-        )
+        decide_complaint(db, actor=actor, complaint_id=complaint_id, decision="revoke", notes="not at fault")
     with factory() as db:
         violation = db.get(Violation, violation_id)
         complaint = db.get(Complaint, complaint_id)
@@ -271,25 +223,19 @@ def test_decide_complaint_confirm_creates_payment_request(workflow_world) -> Non
     factory = get_session_factory()
     with factory() as db:
         actor = db.get(User, ids["officer_id"])
-        apply_stop_outcome(
-            db, actor=actor, violation_id=violation_id, outcome="disputed", notes="dispute"
-        )
-        complaint_id = db.execute(
-            select(Complaint.id).where(Complaint.violation_id == violation_id)
-        ).scalar_one()
+        apply_stop_outcome(db, actor=actor, violation_id=violation_id, outcome="disputed", notes="dispute")
+        complaint_id = db.execute(select(Complaint.id).where(Complaint.violation_id == violation_id)).scalar_one()
     with factory() as db:
         actor = db.get(User, ids["complaint_officer_id"])
-        decide_complaint(
-            db, actor=actor, complaint_id=complaint_id, decision="confirm", notes="confirmed"
-        )
+        decide_complaint(db, actor=actor, complaint_id=complaint_id, decision="confirm", notes="confirmed")
     with factory() as db:
         violation = db.get(Violation, violation_id)
         complaint = db.get(Complaint, complaint_id)
         assert violation.status == VIOLATION_STATUS_PAYMENT_PENDING
         assert complaint.status == COMPLAINT_STATUS_CONFIRMED
-        payment_request = db.execute(
-            select(PaymentRequest).where(PaymentRequest.violation_id == violation_id)
-        ).scalars().one()
+        payment_request = (
+            db.execute(select(PaymentRequest).where(PaymentRequest.violation_id == violation_id)).scalars().one()
+        )
         assert payment_request.status == PAYMENT_STATUS_REQUESTED
 
 
@@ -300,9 +246,7 @@ def test_simulate_payment_callback_marks_paid(workflow_world) -> None:
     factory = get_session_factory()
     with factory() as db:
         actor = db.get(User, ids["officer_id"])
-        apply_stop_outcome(
-            db, actor=actor, violation_id=violation_id, outcome="admitted", notes=None
-        )
+        apply_stop_outcome(db, actor=actor, violation_id=violation_id, outcome="admitted", notes=None)
         payment_request_id = db.execute(
             select(PaymentRequest.id).where(PaymentRequest.violation_id == violation_id)
         ).scalar_one()

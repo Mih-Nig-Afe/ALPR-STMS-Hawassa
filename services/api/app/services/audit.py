@@ -4,9 +4,9 @@ from uuid import uuid4
 
 from sqlalchemy.orm import Session
 
-from app.models.domain import AuditLog, OutboxEvent, User
-from app.core.security import utcnow
 from alpr_stms_shared.constants import OUTBOX_STATUS_PENDING
+from app.core.security import utcnow
+from app.models.domain import AuditLog, OutboxEvent, User
 
 
 def append_audit(

@@ -35,4 +35,3 @@ __all__ = [
     "ViolationEvidence",
     "ViolationRule",
 ]
-

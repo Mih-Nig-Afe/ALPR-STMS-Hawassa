@@ -79,11 +79,7 @@ def _recipient_users(db: Session, actor: User) -> list[User]:
 
 
 def _ensure_payment_request(db: Session, actor: User, violation: Violation) -> PaymentRequest:
-    existing = (
-        db.execute(select(PaymentRequest).where(PaymentRequest.violation_id == violation.id))
-        .scalars()
-        .first()
-    )
+    existing = db.execute(select(PaymentRequest).where(PaymentRequest.violation_id == violation.id)).scalars().first()
     if existing:
         return existing
     payment_request = PaymentRequest(
@@ -121,11 +117,7 @@ def create_violation(
     evidence_bytes: bytes | None,
     evidence_content_type: str | None,
 ) -> Violation:
-    existing = (
-        db.execute(select(Violation).where(Violation.reference_code == payload.submission_ref))
-        .scalars()
-        .first()
-    )
+    existing = db.execute(select(Violation).where(Violation.reference_code == payload.submission_ref)).scalars().first()
     if existing:
         return existing
 
@@ -296,9 +288,7 @@ def apply_stop_outcome(db: Session, *, actor: User, violation_id: str, outcome: 
 
 def decide_complaint(db: Session, *, actor: User, complaint_id: str, decision: str, notes: str | None) -> None:
     complaint = (
-        db.execute(
-            select(Complaint).options(joinedload(Complaint.violation)).where(Complaint.id == complaint_id)
-        )
+        db.execute(select(Complaint).options(joinedload(Complaint.violation)).where(Complaint.id == complaint_id))
         .scalars()
         .first()
     )

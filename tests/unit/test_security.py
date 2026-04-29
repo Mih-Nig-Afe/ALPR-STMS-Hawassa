@@ -6,4 +6,3 @@ def test_password_hash_round_trip() -> None:
     assert hashed.startswith("pbkdf2_sha256$")
     assert verify_password("Phase1StrongPassword!", hashed) is True
     assert verify_password("wrong-password", hashed) is False
-

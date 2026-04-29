@@ -5,12 +5,15 @@ from pathlib import Path
 from sqlalchemy import select
 from sqlalchemy.orm import sessionmaker
 
-from alpr_stms_shared.constants import OUTBOX_STATUS_DELIVERED, OUTBOX_STATUS_FAILED, OUTBOX_STATUS_PENDING
+from alpr_stms_shared.constants import (
+    OUTBOX_STATUS_DELIVERED,
+    OUTBOX_STATUS_FAILED,
+    OUTBOX_STATUS_PENDING,
+)
 from app.core.config import get_settings
 from app.core.security import utcnow
 from app.db.session import build_engine
 from app.models.domain import OutboxEvent
-
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 LOGGER = logging.getLogger("alpr-stms-worker")
@@ -66,4 +69,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-
