@@ -338,6 +338,91 @@ def decide_complaint(db: Session, *, actor: User, complaint_id: str, decision: s
     db.commit()
 
 
+@dataclass
+class PaymentCallbackResult:
+    payment_request_id: str
+    payment_status: str
+    violation_status: str
+    transaction_id: str
+    provider_reference: str
+    idempotent: bool
+
+
+def _record_payment_outcome(
+    db: Session,
+    *,
+    actor: User | None,
+    payment_request: PaymentRequest,
+    provider_reference: str,
+    outcome: str,
+    payload: dict,
+    audit_action: str,
+) -> PaymentCallbackResult:
+    existing = (
+        db.execute(
+            select(PaymentTransaction).where(
+                PaymentTransaction.payment_request_id == payment_request.id,
+                PaymentTransaction.provider_reference == provider_reference,
+            )
+        )
+        .scalars()
+        .first()
+    )
+    if existing is not None:
+        return PaymentCallbackResult(
+            payment_request_id=payment_request.id,
+            payment_status=payment_request.status,
+            violation_status=payment_request.violation.status,
+            transaction_id=existing.id,
+            provider_reference=existing.provider_reference,
+            idempotent=True,
+        )
+
+    transaction = PaymentTransaction(
+        id=str(uuid4()),
+        payment_request_id=payment_request.id,
+        provider_reference=provider_reference,
+        outcome=outcome,
+        payload=payload,
+        created_at=utcnow(),
+    )
+    db.add(transaction)
+
+    if outcome == "success":
+        payment_request.status = PAYMENT_STATUS_PAID
+        payment_request.violation.status = VIOLATION_STATUS_PAID
+    else:
+        payment_request.status = PAYMENT_STATUS_FAILED
+        payment_request.violation.status = VIOLATION_STATUS_PAYMENT_PENDING
+
+    payment_request.violation.updated_at = utcnow()
+    append_audit(
+        db,
+        actor=actor,
+        action=audit_action,
+        entity_type="payment_request",
+        entity_id=payment_request.id,
+        details={"outcome": outcome, "provider_reference": provider_reference},
+    )
+    enqueue_event(
+        db,
+        topic="payment.settled",
+        payload={
+            "payment_request_id": payment_request.id,
+            "outcome": outcome,
+            "provider_reference": provider_reference,
+        },
+    )
+    return PaymentCallbackResult(
+        payment_request_id=payment_request.id,
+        payment_status=payment_request.status,
+        violation_status=payment_request.violation.status,
+        transaction_id=transaction.id,
+        provider_reference=provider_reference,
+        idempotent=False,
+    )
+
+
 def simulate_payment_callback(
     db: Session,
     *,
@@ -345,7 +430,7 @@ def simulate_payment_callback(
     payment_request_id: str,
     outcome: str,
     notes: str | None,
-) -> None:
+) -> PaymentCallbackResult:
     payment_request = (
         db.execute(
             select(PaymentRequest)
@@ -359,31 +444,48 @@ def simulate_payment_callback(
         raise ValueError("Payment request not found")
 
     provider_reference = f"SIM-{payment_request.reference_code}-{uuid4().hex[:8]}"
-    db.add(
-        PaymentTransaction(
-            id=str(uuid4()),
-            payment_request_id=payment_request.id,
-            provider_reference=provider_reference,
-            outcome=outcome,
-            payload={"notes": notes, "simulated": True},
-            created_at=utcnow(),
-        )
-    )
-
-    if outcome == "success":
-        payment_request.status = PAYMENT_STATUS_PAID
-        payment_request.violation.status = VIOLATION_STATUS_PAID
-    else:
-        payment_request.status = PAYMENT_STATUS_FAILED
-        payment_request.violation.status = VIOLATION_STATUS_PAYMENT_PENDING
-
-    payment_request.violation.updated_at = utcnow()
-    append_audit(
+    result = _record_payment_outcome(
         db,
         actor=actor,
-        action="payment.callback",
-        entity_type="payment_request",
-        entity_id=payment_request.id,
-        details={"outcome": outcome, "provider_reference": provider_reference},
+        payment_request=payment_request,
+        provider_reference=provider_reference,
+        outcome=outcome,
+        payload={"notes": notes, "simulated": True},
+        audit_action="payment.callback.simulated",
     )
     db.commit()
+    return result
+
+
+def apply_gateway_callback(
+    db: Session,
+    *,
+    payment_reference: str,
+    provider_reference: str,
+    outcome: str,
+    raw_payload: dict,
+) -> PaymentCallbackResult:
+    if outcome not in {"success", "failure"}:
+        raise ValueError("Unsupported callback outcome")
+    payment_request = (
+        db.execute(
+            select(PaymentRequest)
+            .options(joinedload(PaymentRequest.violation))
+            .where(PaymentRequest.reference_code == payment_reference)
+        )
+        .scalars()
+        .first()
+    )
+    if payment_request is None:
+        raise LookupError("Payment request not found for reference")
+    result = _record_payment_outcome(
+        db,
+        actor=None,
+        payment_request=payment_request,
+        provider_reference=provider_reference,
+        outcome=outcome,
+        payload=raw_payload,
+        audit_action="payment.callback.gateway",
+    )
+    db.commit()
+    return result
