@@ -13,13 +13,16 @@ All notable changes to this repository will be documented in this file.
 
 - `docs/planning/phase-1-master-tracker.md` Section 16 collapsed to a single solo-author signoff row recording approval of the backend release `v0.1.0-phase1`
 - README status block updated to mark Phase 1 backend `v0.1.0-phase1` as released and to advertise the `make first-boot` workflow
+- Admin, violations, alerts, complaints, and payments screens now share reusable template macros (`page_title`, `status_badge`, `empty_row`) for consistent table styling and status rendering
+- List routes for violations, alerts, complaints, and payments now support status filters and expose the active selection in the UI
+- HTML exception handling now renders a consistent dedicated error page for browser clients while API/health routes continue returning JSON responses
 
 ## [v0.1.0-phase1] - 2026-04-29
 
 First tagged release of Phase 1 — the manual-enforcement-first **backend
 milestone** of the ALPR-Based Smart Traffic Management System for Hawassa City.
-Webs and Apps sub-phases of Phase 1 will ship under `v0.2.0-phase1-webs` and
-`v1.0.0-phase1`.
+Webs and Apps sub-phases of Phase 1 are tracked separately and will be released
+under their own tags.
 
 Highlights:
 

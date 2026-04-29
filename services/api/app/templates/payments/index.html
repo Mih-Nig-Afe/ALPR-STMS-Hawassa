@@ -1,42 +1,62 @@
 {% extends "shared/base.html" %}
+{% from "shared/macros.html" import status_badge, empty_row, page_title %}
+
+{% block title %}Payments | {{ settings.app_name }}{% endblock %}
 
 {% block content %}
+{{ page_title('Payments', 'Simulate gateway callbacks during Phase 1 integration.') }}
 <section class="panel">
-  <div class="panel-header">
-    <h2 class="h5 mb-1">Payment requests</h2>
-    <p class="text-muted mb-0">Simulate gateway callbacks during Phase 1 integration.</p>
+  <div class="panel-header d-flex flex-wrap justify-content-between align-items-start gap-2">
+    <div>
+      <h2 class="h5 mb-1">Requests</h2>
+      <p class="text-muted mb-0">{{ payment_requests|length }} request{{ '' if payment_requests|length == 1 else 's' }} in view.</p>
+    </div>
   </div>
+  <form class="filter-bar" method="get" action="/payments" role="search" aria-label="Filter payments">
+    <select class="form-select form-select-sm" style="max-width: 220px" name="status" aria-label="Status filter">
+      <option value="">All statuses</option>
+      {% for opt in (filters.status_options if filters else []) %}
+      <option value="{{ opt }}" {% if filters and filters.status == opt %}selected{% endif %}>{{ opt.title() }}</option>
+      {% endfor %}
+    </select>
+    <button class="btn btn-sm btn-outline-primary" type="submit">Apply</button>
+    {% if filters and filters.status %}<a class="btn btn-sm btn-link" href="/payments">Clear</a>{% endif %}
+  </form>
   <div class="table-responsive">
     <table class="table align-middle">
       <thead>
         <tr>
-          <th>Reference</th>
-          <th>Violation</th>
-          <th>Amount</th>
-          <th>Status</th>
-          <th>Callback</th>
+          <th scope="col">Reference</th>
+          <th scope="col">Violation</th>
+          <th scope="col" class="text-end">Amount</th>
+          <th scope="col">Status</th>
+          <th scope="col">Callback</th>
         </tr>
       </thead>
       <tbody>
         {% for payment in payment_requests %}
         <tr>
-          <td>{{ payment.reference_code }}</td>
+          <td><code>{{ payment.reference_code }}</code></td>
           <td><a href="/violations/{{ payment.violation.id }}">{{ payment.violation.reference_code }}</a></td>
-          <td>{{ payment.amount }}</td>
-          <td><span class="badge text-bg-secondary">{{ payment.status }}</span></td>
+          <td class="text-end">{{ '{:,.2f}'.format(payment.amount) }}</td>
+          <td>{{ status_badge(payment.status) }}</td>
           <td>
+            {% if payment.status == 'REQUESTED' %}
             <form method="post" action="/payments/{{ payment.id }}/simulate" class="d-flex gap-2">
-              <select class="form-select form-select-sm" name="outcome">
+              <select class="form-select form-select-sm" name="outcome" aria-label="Outcome">
                 <option value="success">Success</option>
                 <option value="failed">Failed</option>
               </select>
               <input class="form-control form-control-sm" name="notes" placeholder="Callback notes">
               <button class="btn btn-sm btn-primary" type="submit">Apply</button>
             </form>
+            {% else %}
+            <span class="text-muted small">Settled</span>
+            {% endif %}
           </td>
         </tr>
         {% else %}
-        <tr><td colspan="5" class="text-muted">No payment requests yet.</td></tr>
+        {{ empty_row(5, 'No payments match your filters.' if (filters and filters.status) else 'No payment requests yet.') }}
         {% endfor %}
       </tbody>
     </table>

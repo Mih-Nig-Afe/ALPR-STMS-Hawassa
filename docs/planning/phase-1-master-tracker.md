@@ -84,7 +84,7 @@
 | P1-PAY-001 | Implement payment request and callback simulation | Complete | Codex | P1-COM-001 | payments router and service | Payment requests and status callbacks change violation state |
 | P1-PAY-002 | Implement HMAC-verified gateway callback endpoint | Complete | Codex | P1-PAY-001 | `POST /payments/callback`, `payment_gateway.py`, `apply_gateway_callback`, `docs/integrations/payment-callback.md` | Real payment gateway can settle violations idempotently with replay protection |
 | P1-OPS-001 | Add backup, restore, and release runbooks | Complete | Codex | P1-INF-001 | `infra/deploy/docs`, scripts | Operators can back up and restore the database |
-| P1-TST-001 | Add unit, integration, and smoke coverage | Complete | Codex | P1-AUTH-001 | `tests/unit`, `tests/integration` (36 tests passing) | Core workflows, RBAC, audit, worker, and callback have automated checks |
+| P1-TST-001 | Add unit, integration, and smoke coverage | Complete | Codex | P1-AUTH-001 | `tests/unit`, `tests/integration` (44 tests passing) | Core workflows, RBAC, audit, worker, callback, filters, and error-page contracts have automated checks |
 | P1-TST-002 | Record validation evidence in tracker | Complete | Codex | P1-TST-001 | Section 11 updates | Tracker contains dated execution evidence |
 
 ## 6. Environment and secrets matrix
@@ -175,8 +175,8 @@
 | 2026-04-29 | Runtime bootstrap validation | Complete | `docker compose up` starts all 8 services healthy |
 | 2026-04-29 | Runtime smoke validation | Complete | `./scripts/smoke.sh` passed with liveness, readiness, storage health, and evidence upload/download |
 | 2026-04-29 | Backup and restore smoke | Complete | `./infra/deploy/scripts/backup-restore-smoke.sh` restored 27 public/storage tables into a temporary database |
-| 2026-04-29 | Expanded test suite | Complete | `docker compose run --rm api pytest tests/unit tests/integration` passed with 36 tests covering auth, audit, payment gateway, worker, workflow state machine, callback signing, and routes |
-| 2026-04-29 | End-to-end HTTP lifecycle | Complete | `docker compose run --rm api pytest tests/e2e tests/unit tests/integration` passed with 37 tests, including the lifecycle test that drives officer login, violation submission, alert acknowledgement, dispute, complaint confirmation, and signed gateway payment callback |
+| 2026-04-29 | Expanded test suite | Complete | `docker compose run --rm api pytest tests/unit tests/integration` passed with 43 tests covering auth, audit, payment gateway, worker, workflow state machine, callback signing, route filters, and HTML error rendering |
+| 2026-04-29 | End-to-end HTTP lifecycle | Complete | `docker compose run --rm api pytest tests/e2e tests/unit tests/integration` passed with 44 tests, including the lifecycle test that drives officer login, violation submission, alert acknowledgement, dispute, complaint confirmation, and signed gateway payment callback |
 | 2026-04-29 | Lint and format gate | Complete | `docker compose run --rm api ruff check services tests` and `ruff format --check services tests` both clean across the entire codebase after `pyproject.toml` `flake8-bugbear` exemption for FastAPI dependency-injection helpers and project line-length raised to 120 |
 | 2026-04-29 | CI workflow live | Complete | `.github/workflows/ci.yml` orchestrates `ruff check`, `ruff format --check`, and the full `pytest` suite (unit + integration + e2e) inside the project's Docker Compose stack on every push to `main` and every pull request |
 | 2026-04-29 | Documentation gate | Complete | `docs/api/endpoints.md` enumerates every Phase 1 route and workflow state machine; `docs/integrations/payment-callback.md` defines the gateway contract; `infra/deploy/docs/docker-operations.md` carries a full single-host production runbook (host prep, secrets, TLS, first boot, backups, monitoring, upgrades, rollback) |
@@ -237,13 +237,13 @@
 ## 16. Go-live signoff
 
 This is a solo project, so the four governance roles collapse to a single
-author signoff. The signoff covers the **backend milestone of Phase 1**
-(`v0.1.0-phase1`); the Webs and Apps sub-phases sign off separately at
-`v0.2.0-phase1-webs` and `v1.0.0-phase1`.
+maintainer signoff. The signoff covers the **backend milestone of Phase 1**
+(`v0.1.0-phase1`); future Webs and Apps sub-phases will sign off under their
+own release tags.
 
 | Role | Name | Date | Decision | Notes |
 | --- | --- | --- | --- | --- |
-| Author / sole maintainer | Mihretab Nigatu | 2026-04-29 | Approved for backend release `v0.1.0-phase1` | All nine readiness gates Complete, 37/37 pytest, ruff clean, smoke green, backup-restore-smoke green |
+| Sole maintainer | Project owner | 2026-04-29 | Approved for backend release `v0.1.0-phase1` | All nine readiness gates Complete, 44/44 pytest, ruff clean, smoke green, backup-restore-smoke green |
 
 ## 17. Post-pilot findings
 

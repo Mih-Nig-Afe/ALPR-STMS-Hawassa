@@ -1,18 +1,28 @@
 {% extends "shared/base.html" %}
+{% from "shared/macros.html" import status_badge, datetime_iso %}
+
+{% block title %}{{ violation.reference_code }} | {{ settings.app_name }}{% endblock %}
 
 {% block content %}
+<nav aria-label="breadcrumb" class="mb-3">
+  <ol class="breadcrumb mb-0 small">
+    <li class="breadcrumb-item"><a href="/violations">Violations</a></li>
+    <li class="breadcrumb-item active" aria-current="page">{{ violation.reference_code }}</li>
+  </ol>
+</nav>
 <div class="row g-4">
   <div class="col-lg-8">
     <section class="panel">
-      <div class="panel-header">
-        <h2 class="h5 mb-1">{{ violation.reference_code }}</h2>
-        <p class="text-muted mb-0">{{ violation.rule.name }} | {{ violation.location_text }}</p>
+      <div class="panel-header d-flex flex-wrap justify-content-between align-items-start gap-2">
+        <div>
+          <h2 class="h5 mb-1">{{ violation.reference_code }}</h2>
+          <p class="text-muted mb-0">{{ violation.rule.name }} &middot; {{ violation.location_text }}</p>
+        </div>
+        {{ status_badge(violation.status) }}
       </div>
       <dl class="row mb-0">
-        <dt class="col-sm-3">Status</dt>
-        <dd class="col-sm-9"><span class="badge text-bg-secondary">{{ violation.status }}</span></dd>
         <dt class="col-sm-3">Plate</dt>
-        <dd class="col-sm-9">{{ violation.vehicle_plate }}</dd>
+        <dd class="col-sm-9"><code>{{ violation.vehicle_plate }}</code></dd>
         <dt class="col-sm-3">Penalty</dt>
         <dd class="col-sm-9">{{ violation.draft_penalty_amount }}</dd>
         <dt class="col-sm-3">Driver phone</dt>
@@ -23,6 +33,10 @@
         <dd class="col-sm-9">{{ violation.subcity.name }}</dd>
         <dt class="col-sm-3">Notes</dt>
         <dd class="col-sm-9">{{ violation.notes or 'None' }}</dd>
+        <dt class="col-sm-3">Reported at</dt>
+        <dd class="col-sm-9">{{ datetime_iso(violation.created_at) }}</dd>
+        <dt class="col-sm-3">Last updated</dt>
+        <dd class="col-sm-9">{{ datetime_iso(violation.updated_at) }}</dd>
       </dl>
     </section>
 

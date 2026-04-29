@@ -1,0 +1,46 @@
+{# Reusable rendering macros shared across Phase 1 templates. #}
+
+{% macro status_badge(value) %}
+  {%- set v = (value or '')|string|upper -%}
+  {%- set tone_map = {
+    'REPORTED':         'secondary',
+    'BROADCASTED':      'info',
+    'UNDER_COMPLAINT':  'warning',
+    'CONFIRMED':        'primary',
+    'PAYMENT_PENDING':  'warning',
+    'PAID':             'success',
+    'REVOKED':          'dark',
+    'PENDING':          'secondary',
+    'ACKNOWLEDGED':     'success',
+    'OPEN':             'warning',
+    'REQUESTED':        'info',
+    'FAILED':           'danger',
+    'DELIVERED':        'success',
+  } -%}
+  {%- set tone = tone_map.get(v, 'secondary') -%}
+  <span class="badge text-bg-{{ tone }}" aria-label="status {{ v }}">{{ v.replace('_', ' ').title() }}</span>
+{% endmacro %}
+
+{% macro empty_row(colspan, message='No records yet.') %}
+  <tr>
+    <td colspan="{{ colspan }}" class="text-center text-muted py-4">
+      <div class="empty-state">
+        <div class="empty-state-icon" aria-hidden="true">&#9737;</div>
+        <div>{{ message }}</div>
+      </div>
+    </td>
+  </tr>
+{% endmacro %}
+
+{% macro page_title(title, subtitle='') %}
+  <header class="page-title mb-3">
+    <h1 class="h4 mb-1">{{ title }}</h1>
+    {% if subtitle %}<p class="text-muted mb-0">{{ subtitle }}</p>{% endif %}
+  </header>
+{% endmacro %}
+
+{% macro datetime_iso(value) -%}
+  {%- if value -%}
+    <time datetime="{{ value.isoformat() }}">{{ value.strftime('%Y-%m-%d %H:%M') }}</time>
+  {%- else -%}-{%- endif -%}
+{%- endmacro %}

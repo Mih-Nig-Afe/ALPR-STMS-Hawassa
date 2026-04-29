@@ -9,7 +9,13 @@ from fastapi.responses import JSONResponse, RedirectResponse
 from sqlalchemy import select
 from sqlalchemy.orm import Session, joinedload
 
-from alpr_stms_shared.constants import ROLE_COMPLAINT_OFFICER, ROLE_SYSTEM_ADMIN
+from alpr_stms_shared.constants import (
+    PAYMENT_STATUS_FAILED,
+    PAYMENT_STATUS_PAID,
+    PAYMENT_STATUS_REQUESTED,
+    ROLE_COMPLAINT_OFFICER,
+    ROLE_SYSTEM_ADMIN,
+)
 from app.auth.dependencies import require_roles
 from app.core.config import get_settings
 from app.core.templating import templates
@@ -25,30 +31,43 @@ from app.services.workflows import apply_gateway_callback, simulate_payment_call
 
 router = APIRouter(prefix="/payments", tags=["payments"])
 
+PAYMENT_STATUS_OPTIONS: tuple[str, ...] = (
+    PAYMENT_STATUS_REQUESTED,
+    PAYMENT_STATUS_PAID,
+    PAYMENT_STATUS_FAILED,
+)
+
 
 @router.get("")
 def payments_page(
     request: Request,
+    status: str | None = None,
     current_user: User = Depends(require_roles(ROLE_COMPLAINT_OFFICER, ROLE_SYSTEM_ADMIN)),
     db: Session = Depends(get_db),
 ):
-    payment_requests = (
-        db.execute(
-            select(PaymentRequest)
-            .options(
-                joinedload(PaymentRequest.violation).joinedload(Violation.reporting_officer),
-                joinedload(PaymentRequest.transactions),
-            )
-            .order_by(PaymentRequest.requested_at.desc())
+    query = (
+        select(PaymentRequest)
+        .options(
+            joinedload(PaymentRequest.violation).joinedload(Violation.reporting_officer),
+            joinedload(PaymentRequest.transactions),
         )
-        .unique()
-        .scalars()
-        .all()
+        .order_by(PaymentRequest.requested_at.desc())
     )
+    status_clean = (status or "").strip().upper() or None
+    if status_clean in PAYMENT_STATUS_OPTIONS:
+        query = query.where(PaymentRequest.status == status_clean)
+    payment_requests = db.execute(query).unique().scalars().all()
     return templates.TemplateResponse(
         request,
         "payments/index.html",
-        {"current_user": current_user, "payment_requests": payment_requests},
+        {
+            "current_user": current_user,
+            "payment_requests": payment_requests,
+            "filters": {
+                "status": status_clean,
+                "status_options": list(PAYMENT_STATUS_OPTIONS),
+            },
+        },
     )
 
 

@@ -5,7 +5,11 @@ from fastapi.responses import RedirectResponse
 from sqlalchemy import select
 from sqlalchemy.orm import Session, joinedload
 
-from alpr_stms_shared.constants import ROLE_SYSTEM_ADMIN
+from alpr_stms_shared.constants import (
+    ALERT_STATUS_ACKNOWLEDGED,
+    ALERT_STATUS_PENDING,
+    ROLE_SYSTEM_ADMIN,
+)
 from app.auth.dependencies import require_user
 from app.core.templating import templates
 from app.db.session import get_db
@@ -14,10 +18,13 @@ from app.services.workflows import acknowledge_alert
 
 router = APIRouter(prefix="/alerts", tags=["alerts"])
 
+ALERT_STATUS_OPTIONS: tuple[str, ...] = (ALERT_STATUS_PENDING, ALERT_STATUS_ACKNOWLEDGED)
+
 
 @router.get("")
 def alerts_page(
     request: Request,
+    status: str | None = None,
     current_user: User = Depends(require_user),
     db: Session = Depends(get_db),
 ):
@@ -31,11 +38,21 @@ def alerts_page(
     )
     if current_user.role.code != ROLE_SYSTEM_ADMIN:
         query = query.where(AlertRecipient.user_id == current_user.id)
+    status_clean = (status or "").strip().upper() or None
+    if status_clean in ALERT_STATUS_OPTIONS:
+        query = query.where(AlertRecipient.status == status_clean)
     recipients = db.execute(query).scalars().all()
     return templates.TemplateResponse(
         request,
         "alerts/index.html",
-        {"current_user": current_user, "recipients": recipients},
+        {
+            "current_user": current_user,
+            "recipients": recipients,
+            "filters": {
+                "status": status_clean,
+                "status_options": list(ALERT_STATUS_OPTIONS),
+            },
+        },
     )
 
 

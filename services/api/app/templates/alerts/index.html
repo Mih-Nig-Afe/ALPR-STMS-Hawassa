@@ -1,20 +1,36 @@
 {% extends "shared/base.html" %}
+{% from "shared/macros.html" import status_badge, empty_row, page_title %}
+
+{% block title %}Alerts | {{ settings.app_name }}{% endblock %}
 
 {% block content %}
+{{ page_title('Alert inbox', 'Broadcasted reports awaiting review or acknowledgement.') }}
 <section class="panel">
-  <div class="panel-header">
-    <h2 class="h5 mb-1">Alert inbox</h2>
-    <p class="text-muted mb-0">Broadcasted reports awaiting review or acknowledgement.</p>
+  <div class="panel-header d-flex flex-wrap justify-content-between align-items-start gap-2">
+    <div>
+      <h2 class="h5 mb-1">Recipients</h2>
+      <p class="text-muted mb-0">Showing {{ recipients|length }} alert{{ '' if recipients|length == 1 else 's' }}.</p>
+    </div>
   </div>
+  <form class="filter-bar" method="get" action="/alerts" role="search" aria-label="Filter alerts">
+    <select class="form-select form-select-sm" style="max-width: 220px" name="status" aria-label="Status filter">
+      <option value="">All statuses</option>
+      {% for opt in (filters.status_options if filters else []) %}
+      <option value="{{ opt }}" {% if filters and filters.status == opt %}selected{% endif %}>{{ opt.title() }}</option>
+      {% endfor %}
+    </select>
+    <button class="btn btn-sm btn-outline-primary" type="submit">Apply</button>
+    {% if filters and filters.status %}<a class="btn btn-sm btn-link" href="/alerts">Clear</a>{% endif %}
+  </form>
   <div class="table-responsive">
     <table class="table align-middle">
       <thead>
         <tr>
-          <th>Violation</th>
-          <th>Message</th>
-          <th>Recipient</th>
-          <th>Status</th>
-          <th></th>
+          <th scope="col">Violation</th>
+          <th scope="col">Message</th>
+          <th scope="col">Recipient</th>
+          <th scope="col">Status</th>
+          <th scope="col" class="text-end">Action</th>
         </tr>
       </thead>
       <tbody>
@@ -23,17 +39,19 @@
           <td><a href="/violations/{{ recipient.alert.violation.id }}">{{ recipient.alert.violation.reference_code }}</a></td>
           <td>{{ recipient.alert.message }}</td>
           <td>{{ recipient.user.full_name }}</td>
-          <td><span class="badge text-bg-secondary">{{ recipient.status }}</span></td>
+          <td>{{ status_badge(recipient.status) }}</td>
           <td class="text-end">
             {% if recipient.status != 'ACKNOWLEDGED' %}
             <form method="post" action="/alerts/{{ recipient.id }}/ack">
               <button class="btn btn-sm btn-outline-primary" type="submit">Acknowledge</button>
             </form>
+            {% else %}
+            <span class="text-muted small">&#10003; Done</span>
             {% endif %}
           </td>
         </tr>
         {% else %}
-        <tr><td colspan="5" class="text-muted">No alerts found.</td></tr>
+        {{ empty_row(5, 'No alerts match your filters.' if (filters and filters.status) else 'No alerts found.') }}
         {% endfor %}
       </tbody>
     </table>

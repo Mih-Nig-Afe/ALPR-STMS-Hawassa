@@ -4,10 +4,20 @@ from urllib.parse import urlencode
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Request, UploadFile
 from fastapi.responses import RedirectResponse, StreamingResponse
-from sqlalchemy import select
+from sqlalchemy import func, or_, select
 from sqlalchemy.orm import Session, joinedload
 
-from alpr_stms_shared.constants import ROLE_SYSTEM_ADMIN, ROLE_TRAFFIC_OFFICER
+from alpr_stms_shared.constants import (
+    ROLE_SYSTEM_ADMIN,
+    ROLE_TRAFFIC_OFFICER,
+    VIOLATION_STATUS_BROADCASTED,
+    VIOLATION_STATUS_CONFIRMED,
+    VIOLATION_STATUS_PAID,
+    VIOLATION_STATUS_PAYMENT_PENDING,
+    VIOLATION_STATUS_REPORTED,
+    VIOLATION_STATUS_REVOKED,
+    VIOLATION_STATUS_UNDER_COMPLAINT,
+)
 from app.auth.dependencies import require_roles, require_user
 from app.core.templating import templates
 from app.db.session import get_db
@@ -17,10 +27,22 @@ from app.storage.client import StorageClient
 
 router = APIRouter(prefix="/violations", tags=["violations"])
 
+VIOLATION_STATUS_OPTIONS: tuple[str, ...] = (
+    VIOLATION_STATUS_REPORTED,
+    VIOLATION_STATUS_BROADCASTED,
+    VIOLATION_STATUS_UNDER_COMPLAINT,
+    VIOLATION_STATUS_CONFIRMED,
+    VIOLATION_STATUS_PAYMENT_PENDING,
+    VIOLATION_STATUS_PAID,
+    VIOLATION_STATUS_REVOKED,
+)
+
 
 @router.get("")
 def violations_page(
     request: Request,
+    q: str | None = None,
+    status: str | None = None,
     current_user: User = Depends(require_roles(ROLE_TRAFFIC_OFFICER, ROLE_SYSTEM_ADMIN)),
     db: Session = Depends(get_db),
 ):
@@ -29,17 +51,25 @@ def violations_page(
         .scalars()
         .all()
     )
-    violations = (
-        db.execute(
-            select(Violation)
-            .options(joinedload(Violation.rule), joinedload(Violation.evidence_items))
-            .where(Violation.reporting_officer_id == current_user.id)
-            .order_by(Violation.created_at.desc())
-        )
-        .unique()
-        .scalars()
-        .all()
+    query = (
+        select(Violation)
+        .options(joinedload(Violation.rule), joinedload(Violation.evidence_items))
+        .where(Violation.reporting_officer_id == current_user.id)
+        .order_by(Violation.created_at.desc())
     )
+    q_clean = (q or "").strip()
+    status_clean = (status or "").strip().upper() or None
+    if q_clean:
+        like = f"%{q_clean.upper()}%"
+        query = query.where(
+            or_(
+                func.upper(Violation.vehicle_plate).like(like),
+                func.upper(Violation.reference_code).like(like),
+            )
+        )
+    if status_clean and status_clean in VIOLATION_STATUS_OPTIONS:
+        query = query.where(Violation.status == status_clean)
+    violations = db.execute(query).unique().scalars().all()
     return templates.TemplateResponse(
         request,
         "violations/index.html",
@@ -47,6 +77,11 @@ def violations_page(
             "current_user": current_user,
             "rules": rules,
             "violations": violations,
+            "filters": {
+                "q": q_clean,
+                "status": status_clean,
+                "status_options": list(VIOLATION_STATUS_OPTIONS),
+            },
         },
     )
 

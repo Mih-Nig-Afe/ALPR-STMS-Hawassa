@@ -1,20 +1,37 @@
 {% extends "shared/base.html" %}
+{% from "shared/macros.html" import empty_row, page_title, datetime_iso %}
+
+{% block title %}Admin | {{ settings.app_name }}{% endblock %}
 
 {% block content %}
-<div class="row g-4 mb-4">
-  <div class="col-md-4">
+{{ page_title('Admin overview', 'Operational state of the Phase 1 platform.') }}
+
+<div class="row g-3 mb-4">
+  <div class="col-md-6 col-xl">
     <section class="panel stat-panel">
       <div class="text-muted small">Users</div>
       <div class="display-value">{{ stats.total_users }}</div>
     </section>
   </div>
-  <div class="col-md-4">
+  <div class="col-md-6 col-xl">
+    <section class="panel stat-panel">
+      <div class="text-muted small">Subcities</div>
+      <div class="display-value">{{ stats.total_subcities }}</div>
+    </section>
+  </div>
+  <div class="col-md-6 col-xl">
     <section class="panel stat-panel">
       <div class="text-muted small">Violations</div>
       <div class="display-value">{{ stats.total_violations }}</div>
     </section>
   </div>
-  <div class="col-md-4">
+  <div class="col-md-6 col-xl">
+    <section class="panel stat-panel">
+      <div class="text-muted small">Payment requests</div>
+      <div class="display-value">{{ stats.total_payments }}</div>
+    </section>
+  </div>
+  <div class="col-md-6 col-xl">
     <section class="panel stat-panel">
       <div class="text-muted small">Rules</div>
       <div class="display-value">{{ stats.total_rules }}</div>
@@ -22,31 +39,117 @@
   </div>
 </div>
 
-<section class="panel">
+<div class="row g-4">
+  <div class="col-xl-7">
+    <section class="panel">
+      <div class="panel-header d-flex flex-wrap justify-content-between align-items-start gap-2">
+        <div>
+          <h2 class="h5 mb-1">Users</h2>
+          <p class="text-muted mb-0">Latest 50 accounts.</p>
+        </div>
+      </div>
+      <div class="table-responsive">
+        <table class="table align-middle">
+          <thead>
+            <tr>
+              <th scope="col">Username</th>
+              <th scope="col">Full name</th>
+              <th scope="col">Role</th>
+              <th scope="col">Subcity</th>
+              <th scope="col">Active</th>
+              <th scope="col">Joined</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for user in users %}
+            <tr>
+              <td><code>{{ user.username }}</code></td>
+              <td>{{ user.full_name }}</td>
+              <td><span class="badge text-bg-light">{{ user.role.name }}</span></td>
+              <td>{{ user.default_subcity.name if user.default_subcity else '-' }}</td>
+              <td>
+                {% if user.is_active %}
+                <span class="badge text-bg-success">Yes</span>
+                {% else %}
+                <span class="badge text-bg-secondary">No</span>
+                {% endif %}
+              </td>
+              <td>{{ datetime_iso(user.created_at) }}</td>
+            </tr>
+            {% else %}
+            {{ empty_row(6, 'No users yet.') }}
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <div class="col-xl-5">
+    <section class="panel">
+      <div class="panel-header">
+        <h2 class="h5 mb-1">Subcities</h2>
+        <p class="text-muted mb-0">Coverage and assignments.</p>
+      </div>
+      <div class="table-responsive">
+        <table class="table align-middle">
+          <thead>
+            <tr>
+              <th scope="col">Code</th>
+              <th scope="col">Name</th>
+              <th scope="col" class="text-end">Officers</th>
+              <th scope="col">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for subcity in subcities %}
+            <tr>
+              <td><code>{{ subcity.code }}</code></td>
+              <td>{{ subcity.name }}</td>
+              <td class="text-end">{{ user_counts_by_subcity.get(subcity.id, 0) }}</td>
+              <td>
+                {% if subcity.is_active %}
+                <span class="badge text-bg-success">Active</span>
+                {% else %}
+                <span class="badge text-bg-secondary">Inactive</span>
+                {% endif %}
+              </td>
+            </tr>
+            {% else %}
+            {{ empty_row(4, 'No subcities seeded.') }}
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+</div>
+
+<section class="panel mt-4">
   <div class="panel-header">
     <h2 class="h5 mb-1">Recent audit log</h2>
-    <p class="text-muted mb-0">Latest state changes across the platform.</p>
+    <p class="text-muted mb-0">Latest 20 state changes across the platform.</p>
   </div>
   <div class="table-responsive">
     <table class="table align-middle">
       <thead>
         <tr>
-          <th>When</th>
-          <th>Action</th>
-          <th>Entity</th>
-          <th>Details</th>
+          <th scope="col">When</th>
+          <th scope="col">Action</th>
+          <th scope="col">Entity</th>
+          <th scope="col">Details</th>
         </tr>
       </thead>
       <tbody>
         {% for entry in recent_audits %}
         <tr>
-          <td>{{ entry.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
-          <td>{{ entry.action }}</td>
-          <td>{{ entry.entity_type }} {{ entry.entity_id }}</td>
+          <td>{{ datetime_iso(entry.created_at) }}</td>
+          <td><span class="badge text-bg-info">{{ entry.action }}</span></td>
+          <td>{{ entry.entity_type }} <code class="small">{{ entry.entity_id }}</code></td>
           <td><code>{{ entry.details }}</code></td>
         </tr>
         {% else %}
-        <tr><td colspan="4" class="text-muted">No audit entries yet.</td></tr>
+        {{ empty_row(4, 'No audit entries yet.') }}
         {% endfor %}
       </tbody>
     </table>

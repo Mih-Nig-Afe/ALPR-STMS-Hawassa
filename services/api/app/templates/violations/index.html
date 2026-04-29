@@ -1,6 +1,10 @@
 {% extends "shared/base.html" %}
+{% from "shared/macros.html" import status_badge, empty_row, page_title, datetime_iso %}
+
+{% block title %}Violations | {{ settings.app_name }}{% endblock %}
 
 {% block content %}
+{{ page_title('Violations', 'Report incidents and review your reports.') }}
 <div class="row g-4">
   <div class="col-xl-5">
     <section class="panel">
@@ -65,19 +69,33 @@
 
   <div class="col-xl-7">
     <section class="panel">
-      <div class="panel-header">
-        <h2 class="h5 mb-1">Recent violations</h2>
-        <p class="text-muted mb-0">Latest reports created by this officer.</p>
+      <div class="panel-header d-flex flex-wrap justify-content-between align-items-start gap-2">
+        <div>
+          <h2 class="h5 mb-1">Recent violations</h2>
+          <p class="text-muted mb-0">Latest reports created by this officer.</p>
+        </div>
+        <span class="badge text-bg-light align-self-center">{{ violations|length }} record{{ '' if violations|length == 1 else 's' }}</span>
       </div>
+      <form class="filter-bar" method="get" action="/violations" role="search" aria-label="Filter violations">
+        <input class="form-control form-control-sm" style="max-width: 240px" type="search" name="q" value="{{ filters.q or '' }}" placeholder="Search plate or reference">
+        <select class="form-select form-select-sm" style="max-width: 200px" name="status" aria-label="Status filter">
+          <option value="">All statuses</option>
+          {% for opt in filters.status_options %}
+          <option value="{{ opt }}" {% if filters.status == opt %}selected{% endif %}>{{ opt.replace('_',' ').title() }}</option>
+          {% endfor %}
+        </select>
+        <button class="btn btn-sm btn-outline-primary" type="submit">Apply</button>
+        {% if filters.q or filters.status %}<a class="btn btn-sm btn-link" href="/violations">Clear</a>{% endif %}
+      </form>
       <div class="table-responsive">
         <table class="table align-middle">
           <thead>
             <tr>
-              <th>Reference</th>
-              <th>Rule</th>
-              <th>Status</th>
-              <th>Plate</th>
-              <th>Updated</th>
+              <th scope="col">Reference</th>
+              <th scope="col">Rule</th>
+              <th scope="col">Status</th>
+              <th scope="col">Plate</th>
+              <th scope="col">Updated</th>
             </tr>
           </thead>
           <tbody>
@@ -85,12 +103,12 @@
             <tr>
               <td><a href="/violations/{{ violation.id }}">{{ violation.reference_code }}</a></td>
               <td>{{ violation.rule.name }}</td>
-              <td><span class="badge text-bg-secondary">{{ violation.status }}</span></td>
-              <td>{{ violation.vehicle_plate }}</td>
-              <td>{{ violation.updated_at.strftime('%Y-%m-%d %H:%M') if violation.updated_at else '' }}</td>
+              <td>{{ status_badge(violation.status) }}</td>
+              <td><code>{{ violation.vehicle_plate }}</code></td>
+              <td>{{ datetime_iso(violation.updated_at) }}</td>
             </tr>
             {% else %}
-            <tr><td colspan="5" class="text-muted">No violations yet.</td></tr>
+            {{ empty_row(5, 'No violations match your filters.' if (filters.q or filters.status) else 'No violations yet.') }}
             {% endfor %}
           </tbody>
         </table>

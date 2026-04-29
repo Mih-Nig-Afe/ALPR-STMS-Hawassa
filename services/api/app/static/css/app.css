@@ -3,13 +3,44 @@
   --app-bg: #f4f7fb;
   --app-panel: #ffffff;
   --app-text: #17212b;
+  --app-muted: #5b6675;
   --app-accent: #1d4ed8;
   --app-accent-2: #0f766e;
+  --app-focus-ring: rgba(29, 78, 216, 0.35);
+}
+
+html, body {
+  min-height: 100%;
 }
 
 body {
   background: var(--app-bg);
   color: var(--app-text);
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+main {
+  flex: 1 0 auto;
+}
+
+:focus-visible {
+  outline: 3px solid var(--app-focus-ring);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.skip-link {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1080;
+  background: var(--app-accent);
+  color: #fff;
+  padding: 0.5rem 1rem;
+  border-bottom-right-radius: 6px;
+  text-decoration: none;
 }
 
 .app-shell .panel,
@@ -57,9 +88,90 @@ code {
   white-space: pre-wrap;
 }
 
+.app-footer {
+  background: #fff;
+}
+
+.empty-state {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.empty-state-icon {
+  font-size: 1.75rem;
+  color: var(--app-muted);
+}
+
+.error-panel {
+  max-width: 520px;
+  margin: 3rem auto;
+}
+
+.error-code {
+  font-size: 5rem;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.05em;
+}
+
+.page-title h1 {
+  font-weight: 700;
+}
+
+.filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.timeline {
+  list-style: none;
+  padding-left: 0;
+  border-left: 2px solid var(--app-border);
+  margin-left: 0.5rem;
+}
+
+.timeline li {
+  position: relative;
+  padding: 0 0 1rem 1.25rem;
+}
+
+.timeline li::before {
+  content: "";
+  position: absolute;
+  left: -7px;
+  top: 0.4rem;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--app-accent);
+}
+
 @media (max-width: 991px) {
   .map-panel {
     min-height: 240px;
+  }
+}
+
+@media print {
+  .app-footer,
+  .navbar,
+  .skip-link,
+  form button,
+  .filter-bar {
+    display: none !important;
+  }
+
+  body {
+    background: #fff;
+  }
+
+  .panel {
+    border: 1px solid #000;
+    box-shadow: none;
   }
 }
 

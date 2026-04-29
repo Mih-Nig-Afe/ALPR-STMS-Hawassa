@@ -1,19 +1,35 @@
 {% extends "shared/base.html" %}
+{% from "shared/macros.html" import status_badge, empty_row, page_title %}
+
+{% block title %}Complaints | {{ settings.app_name }}{% endblock %}
 
 {% block content %}
+{{ page_title('Complaints', 'Review disputed reports and confirm or revoke them.') }}
 <section class="panel">
-  <div class="panel-header">
-    <h2 class="h5 mb-1">Complaint queue</h2>
-    <p class="text-muted mb-0">Review disputed reports and confirm or revoke them.</p>
+  <div class="panel-header d-flex flex-wrap justify-content-between align-items-start gap-2">
+    <div>
+      <h2 class="h5 mb-1">Queue</h2>
+      <p class="text-muted mb-0">{{ complaints|length }} complaint{{ '' if complaints|length == 1 else 's' }} in view.</p>
+    </div>
   </div>
+  <form class="filter-bar" method="get" action="/complaints" role="search" aria-label="Filter complaints">
+    <select class="form-select form-select-sm" style="max-width: 220px" name="status" aria-label="Status filter">
+      <option value="">All statuses</option>
+      {% for opt in (filters.status_options if filters else []) %}
+      <option value="{{ opt }}" {% if filters and filters.status == opt %}selected{% endif %}>{{ opt.title() }}</option>
+      {% endfor %}
+    </select>
+    <button class="btn btn-sm btn-outline-primary" type="submit">Apply</button>
+    {% if filters and filters.status %}<a class="btn btn-sm btn-link" href="/complaints">Clear</a>{% endif %}
+  </form>
   <div class="table-responsive">
     <table class="table align-middle">
       <thead>
         <tr>
-          <th>Violation</th>
-          <th>Reason</th>
-          <th>Status</th>
-          <th>Decision</th>
+          <th scope="col">Violation</th>
+          <th scope="col">Reason</th>
+          <th scope="col">Status</th>
+          <th scope="col">Decision</th>
         </tr>
       </thead>
       <tbody>
@@ -24,20 +40,24 @@
             <div class="small text-muted">{{ complaint.violation.rule.name }}</div>
           </td>
           <td>{{ complaint.reason }}</td>
-          <td><span class="badge text-bg-secondary">{{ complaint.status }}</span></td>
+          <td>{{ status_badge(complaint.status) }}</td>
           <td>
+            {% if complaint.status == 'OPEN' %}
             <form method="post" action="/complaints/{{ complaint.id }}/decision" class="d-grid gap-2">
-              <select class="form-select form-select-sm" name="decision">
+              <select class="form-select form-select-sm" name="decision" aria-label="Decision">
                 <option value="confirm">Confirm violation</option>
                 <option value="revoke">Revoke violation</option>
               </select>
               <input class="form-control form-control-sm" name="notes" placeholder="Decision notes">
               <button class="btn btn-sm btn-primary" type="submit">Save</button>
             </form>
+            {% else %}
+            <span class="text-muted small">Decided</span>
+            {% endif %}
           </td>
         </tr>
         {% else %}
-        <tr><td colspan="4" class="text-muted">No complaints available.</td></tr>
+        {{ empty_row(4, 'No complaints match your filters.' if (filters and filters.status) else 'No complaints available.') }}
         {% endfor %}
       </tbody>
     </table>
