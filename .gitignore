@@ -56,7 +56,7 @@ logs/
 tmp/
 temp/
 uploads/
-storage/
+/storage/
 
 # GitHub editor artifacts
 *.orig

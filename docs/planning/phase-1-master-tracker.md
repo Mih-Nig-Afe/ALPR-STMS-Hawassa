@@ -41,7 +41,7 @@
 | Environment templates exist | Complete | Local, staging, and production examples |
 | Runtime service scaffolds exist | Complete | API, worker, templates, and static assets are in place |
 | Database migration baseline exists | Complete | Alembic baseline and seed payloads are in repository |
-| Smoke verification recorded | Blocked | Docker daemon inactive on host prevented `compose up` validation |
+| Smoke verification recorded | Complete | Docker stack is healthy and `./scripts/smoke.sh` passes |
 
 ## 4. Phase 1 scope lock
 
@@ -73,7 +73,7 @@
 | P1-REP-001 | Establish canonical tracker and pointer documents | Complete | Codex | None | `docs/planning/*`, root pointer | One canonical tracker and no duplicated plan authority |
 | P1-REP-002 | Repair README and repository hygiene workflow | Complete | Codex | P1-REP-001 | `README.md`, workflow file | Links and required path checks align with repository |
 | P1-REP-003 | Add ADRs, Python metadata, env templates, and Makefile | Complete | Codex | P1-REP-002 | root config files, ADR docs | Repo has formal build, lint, and environment contracts |
-| P1-INF-001 | Define Docker Compose baseline and local override | In progress | Codex | P1-REP-003 | `compose.yaml`, `compose.override.yaml` | Entire Phase 1 stack boots through Docker only |
+| P1-INF-001 | Define Docker Compose baseline and local override | Complete | Codex | P1-REP-003 | `compose.yaml`, `compose.override.yaml` | Entire Phase 1 stack boots through Docker only |
 | P1-INF-002 | Add reverse proxy and operational scripts | Complete | Codex | P1-INF-001 | `infra/deploy/` | Proxy routes UI, storage, and rest endpoints predictably |
 | P1-DB-001 | Create initial schema and migration baseline | Complete | Codex | P1-INF-001 | Alembic files | All Phase 1 tables exist and migrate cleanly |
 | P1-DB-002 | Create seed payloads and idempotent bootstrap flow | Complete | Codex | P1-DB-001 | `data/seed/`, bootstrap code | Local stack creates baseline roles, users, rules, and subcities |
@@ -82,7 +82,7 @@
 | P1-ALT-001 | Implement alert generation and acknowledgement | Complete | Codex | P1-VIO-001 | alerts router, tables | Recipients receive and acknowledge alerts |
 | P1-COM-001 | Implement complaint review workflow | Complete | Codex | P1-ALT-001 | complaints router and service | Complaint officer can confirm or revoke a disputed violation |
 | P1-PAY-001 | Implement payment request and callback simulation | Complete | Codex | P1-COM-001 | payments router and service | Payment requests and status callbacks change violation state |
-| P1-OPS-001 | Add backup, restore, and release runbooks | In progress | Codex | P1-INF-001 | `infra/deploy/docs`, scripts | Operators can back up and restore the database |
+| P1-OPS-001 | Add backup, restore, and release runbooks | Complete | Codex | P1-INF-001 | `infra/deploy/docs`, scripts | Operators can back up and restore the database |
 | P1-TST-001 | Add unit, integration, and smoke coverage | In progress | Codex | P1-AUTH-001 | `tests/` | Core workflows have automated checks |
 | P1-TST-002 | Record validation evidence in tracker | Complete | Codex | P1-TST-001 | Section 11 updates | Tracker contains dated execution evidence |
 
@@ -169,21 +169,22 @@
 | 2026-04-29 | Repository structure review | Complete | Canonical tracker and Docker-first contract defined |
 | 2026-04-29 | Python compile validation | Complete | `python3 -m compileall services/api services/worker packages/shared tests` |
 | 2026-04-29 | App import validation | Complete | `PYTHONPATH=services/api:services/worker:packages/shared python3 -c "from app.main import app"` |
-| 2026-04-29 | Unit and integration tests | Complete | `PYTHONPATH=services/api:services/worker:packages/shared python3 -m pytest tests/unit tests/integration -q` passed |
+| 2026-04-29 | Unit and integration tests | Complete | `PYTHONPATH=services/api:services/worker:packages/shared python3 -m pytest tests/unit tests/integration -q` passed, 7 tests |
 | 2026-04-29 | Compose static validation | Complete | `docker compose config` resolved successfully |
-| 2026-04-29 | Runtime bootstrap validation | Blocked | Docker daemon inactive on host prevented `docker compose up` |
-| 2026-04-29 | Backup and restore smoke | Pending | Scripts exist but not executed yet |
+| 2026-04-29 | Runtime bootstrap validation | Complete | `docker compose up` starts all 8 services healthy |
+| 2026-04-29 | Runtime smoke validation | Complete | `./scripts/smoke.sh` passed with liveness, readiness, storage health, and evidence upload/download |
+| 2026-04-29 | Backup and restore smoke | Complete | `./infra/deploy/scripts/backup-restore-smoke.sh` restored 27 public/storage tables into a temporary database |
 
 ## 12. Risk and blocker register
 
 | ID | Risk / blocker | Impact | Mitigation | Status |
 | --- | --- | --- | --- | --- |
 | R-001 | Scope leakage from future phases | High | Keep tracker scope lock and ADRs explicit | Active |
-| R-002 | Storage API misconfiguration in self-hosted mode | High | Use official image contracts and local health checks | Active |
+| R-002 | Storage API misconfiguration in self-hosted mode | High | Use official image contracts and local health checks | Mitigated |
 | R-003 | Missing gateway contract for real payments | Medium | Ship callback simulation first and isolate adapter layer | Active |
 | R-004 | Weak operational discipline around tracker updates | Medium | Require tracker updates in every implementation change | Active |
 | R-005 | Schedule pressure causes incomplete tests | High | Gate progress on smoke, auth, and workflow checks | Active |
-| R-006 | Local Docker daemon inactive during verification | Medium | Start Docker and rerun `make up` and `make smoke` | Active |
+| R-006 | Local Docker daemon inactive during verification | Medium | Start Docker and rerun `make up` and `make smoke` | Resolved |
 
 ## 13. Decision log
 
@@ -203,6 +204,7 @@
 | 2026-04-29 | Legacy plan paths demoted to pointer documents |
 | 2026-04-29 | Repository formalization and Docker-first implementation approved |
 | 2026-04-29 | FastAPI app, worker, Alembic baseline, seeds, vendor assets, and tests added |
+| 2026-04-29 | Docker runtime, Supabase storage, smoke, and backup/restore validation completed |
 
 ## 15. Deployment readiness gate
 
@@ -210,13 +212,13 @@
 | --- | --- | --- |
 | Documentation | Canonical tracker and ADRs updated | Complete |
 | Configuration | Env templates complete | Complete |
-| Runtime | Docker stack builds and becomes healthy | Blocked |
-| Data | Migrations and seeds run cleanly | In progress |
+| Runtime | Docker stack builds and becomes healthy | Complete |
+| Data | Migrations and seeds run cleanly | Complete |
 | Security | Session auth, RBAC, secrets separation, callback secret | Complete |
-| Evidence | Storage bucket reachable and upload path works | In progress |
+| Evidence | Storage bucket reachable and upload path works | Complete |
 | Audit | State transitions write audit logs | Complete |
 | Testing | Smoke, unit, integration, and browser checks recorded | In progress |
-| Operations | Backup and restore procedure verified | In progress |
+| Operations | Backup and restore procedure verified | Complete |
 
 ## 16. Go-live signoff
 
