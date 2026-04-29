@@ -23,3 +23,6 @@ All notable changes to this repository will be documented in this file.
 - `apply_gateway_callback` workflow plus shared `_record_payment_outcome` helper that writes audit log and `payment.settled` outbox event
 - Unit tests for the HMAC signing helper and integration tests for the callback endpoint covering signed/unsigned, success, failure, and idempotent replay paths
 - `docs/integrations/payment-callback.md` describing the gateway contract
+- Unit tests for RBAC dependencies (`require_user`, `require_roles`), audit and outbox helpers, and the worker's `process_batch` and `update_heartbeat`
+- Integration tests for the full violation lifecycle: report -> broadcast -> acknowledge -> stop outcome (admitted/disputed) -> complaint decide (confirm/revoke) -> simulated payment settlement
+- Test suite expanded from 7 to 36 passing tests against the live Docker stack

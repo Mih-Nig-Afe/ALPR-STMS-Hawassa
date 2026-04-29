@@ -84,7 +84,7 @@
 | P1-PAY-001 | Implement payment request and callback simulation | Complete | Codex | P1-COM-001 | payments router and service | Payment requests and status callbacks change violation state |
 | P1-PAY-002 | Implement HMAC-verified gateway callback endpoint | Complete | Codex | P1-PAY-001 | `POST /payments/callback`, `payment_gateway.py`, `apply_gateway_callback`, `docs/integrations/payment-callback.md` | Real payment gateway can settle violations idempotently with replay protection |
 | P1-OPS-001 | Add backup, restore, and release runbooks | Complete | Codex | P1-INF-001 | `infra/deploy/docs`, scripts | Operators can back up and restore the database |
-| P1-TST-001 | Add unit, integration, and smoke coverage | In progress | Codex | P1-AUTH-001 | `tests/` | Core workflows have automated checks |
+| P1-TST-001 | Add unit, integration, and smoke coverage | Complete | Codex | P1-AUTH-001 | `tests/unit`, `tests/integration` (36 tests passing) | Core workflows, RBAC, audit, worker, and callback have automated checks |
 | P1-TST-002 | Record validation evidence in tracker | Complete | Codex | P1-TST-001 | Section 11 updates | Tracker contains dated execution evidence |
 
 ## 6. Environment and secrets matrix
@@ -175,6 +175,7 @@
 | 2026-04-29 | Runtime bootstrap validation | Complete | `docker compose up` starts all 8 services healthy |
 | 2026-04-29 | Runtime smoke validation | Complete | `./scripts/smoke.sh` passed with liveness, readiness, storage health, and evidence upload/download |
 | 2026-04-29 | Backup and restore smoke | Complete | `./infra/deploy/scripts/backup-restore-smoke.sh` restored 27 public/storage tables into a temporary database |
+| 2026-04-29 | Expanded test suite | Complete | `docker compose run --rm api pytest tests/unit tests/integration` passed with 36 tests covering auth, audit, payment gateway, worker, workflow state machine, callback signing, and routes |
 
 ## 12. Risk and blocker register
 
@@ -208,6 +209,7 @@
 | 2026-04-29 | Docker runtime, Supabase storage, smoke, and backup/restore validation completed |
 | 2026-04-29 | Tracker reconciled: schema, endpoint, and UI checklists marked Complete to match shipped state |
 | 2026-04-29 | HMAC-verified `POST /payments/callback` endpoint and gateway contract documentation shipped |
+| 2026-04-29 | Test coverage expanded to 36 passing tests covering RBAC, audit, payment gateway, worker, full workflow state machine, callback verification, and routes |
 
 ## 15. Deployment readiness gate
 
@@ -220,7 +222,7 @@
 | Security | Session auth, RBAC, secrets separation, callback secret | Complete |
 | Evidence | Storage bucket reachable and upload path works | Complete |
 | Audit | State transitions write audit logs | Complete |
-| Testing | Smoke, unit, integration, and browser checks recorded | In progress |
+| Testing | Smoke, unit, integration, and browser checks recorded | Complete |
 | Operations | Backup and restore procedure verified | Complete |
 
 ## 16. Go-live signoff
