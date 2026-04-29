@@ -236,12 +236,14 @@
 
 ## 16. Go-live signoff
 
+This is a solo project, so the four governance roles collapse to a single
+author signoff. The signoff covers the **backend milestone of Phase 1**
+(`v0.1.0-phase1`); the Webs and Apps sub-phases sign off separately at
+`v0.2.0-phase1-webs` and `v1.0.0-phase1`.
+
 | Role | Name | Date | Decision | Notes |
 | --- | --- | --- | --- | --- |
-| Product owner |  |  |  |  |
-| Technical lead |  |  |  |  |
-| Operations lead |  |  |  |  |
-| Security reviewer |  |  |  |  |
+| Author / sole maintainer | Mihretab Nigatu | 2026-04-29 | Approved for backend release `v0.1.0-phase1` | All nine readiness gates Complete, 37/37 pytest, ruff clean, smoke green, backup-restore-smoke green |
 
 ## 17. Post-pilot findings
 

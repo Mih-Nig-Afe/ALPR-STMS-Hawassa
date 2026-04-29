@@ -99,6 +99,15 @@ remains correct.
 
 ### 4. First boot
 
+The fastest path is the one-shot bootstrap, which is idempotent and safe to
+re-run:
+
+```bash
+make first-boot
+```
+
+Equivalent step-by-step sequence:
+
 ```bash
 docker compose pull
 docker compose build

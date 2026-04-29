@@ -1,6 +1,6 @@
 COMPOSE := docker compose
 
-.PHONY: env up down build ps logs migrate seed smoke test backup backup-smoke restore lint format
+.PHONY: env up down build ps logs migrate seed smoke test backup backup-smoke restore lint format first-boot
 
 env:
 	cp -n .env.example .env || true
@@ -46,3 +46,6 @@ backup-smoke:
 
 restore:
 	./infra/deploy/scripts/restore-db.sh
+
+first-boot:
+	./infra/deploy/scripts/first-boot.sh

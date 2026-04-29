@@ -8,7 +8,9 @@ Manual-enforcement-first traffic enforcement platform for Hawassa City, structur
 - Docker-first runtime baseline: complete
 - FastAPI service scaffold: complete
 - Self-hosted Supabase subset: complete
-- Phase 1 workflow tracker: closing out (see [`docs/planning/phase-1-master-tracker.md`](docs/planning/phase-1-master-tracker.md))
+- Phase 1 backend (`v0.1.0-phase1`): **released** — all nine readiness gates Complete (37/37 pytest, ruff clean, smoke green, backup-restore-smoke green); see [`docs/planning/phase-1-master-tracker.md`](docs/planning/phase-1-master-tracker.md)
+- Phase 1 webs sub-phase: in progress
+- Phase 1 apps (PWA) sub-phase: pending
 - Continuous integration: lint + structure check + pytest on every push and pull request
 
 ## Phase 1 Target
@@ -86,6 +88,18 @@ The original academic and design submission remains preserved under `archive/sou
 These materials are archival references and should not be overwritten.
 
 ## Local Operations
+
+The fastest path on a fresh host is the one-shot bootstrap:
+
+```bash
+make first-boot
+```
+
+This wraps env initialisation, `docker compose up --build`, the api healthcheck
+wait, alembic migration, seed bootstrap, and the runtime smoke script. It is
+idempotent and safe to re-run.
+
+If you prefer the steps individually:
 
 1. Copy `.env.example` to `.env`
 2. Build and start the stack with `make up`

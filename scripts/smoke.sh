@@ -41,4 +41,15 @@ if "image/png" not in content_type:
     raise SystemExit(f"unexpected evidence content type: {content_type}")
 PY
 
+echo "Checking proxy login page render"
+login_html=$(curl -fsS http://localhost:8080/auth/login)
+if ! grep -q "ALPR STMS Hawassa Login" <<<"$login_html"; then
+  echo "ERROR: /auth/login did not render the expected title" >&2
+  exit 1
+fi
+if ! grep -q '<form' <<<"$login_html"; then
+  echo "ERROR: /auth/login did not render a login form" >&2
+  exit 1
+fi
+
 echo "Smoke checks passed"

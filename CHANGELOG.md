@@ -6,6 +6,44 @@ All notable changes to this repository will be documented in this file.
 
 ### Added
 
+- `infra/deploy/scripts/first-boot.sh` and `make first-boot` one-shot bootstrap that runs env init, `docker compose up --build`, api healthcheck wait, `alembic upgrade head`, seed bootstrap, and the runtime smoke script
+- `scripts/smoke.sh` now also asserts that the proxy renders the login page (title and `<form>` present), catching template-render regressions in addition to the JSON health endpoints
+
+### Changed
+
+- `docs/planning/phase-1-master-tracker.md` Section 16 collapsed to a single solo-author signoff row recording approval of the backend release `v0.1.0-phase1`
+- README status block updated to mark Phase 1 backend `v0.1.0-phase1` as released and to advertise the `make first-boot` workflow
+
+## [v0.1.0-phase1] - 2026-04-29
+
+First tagged release of Phase 1 — the manual-enforcement-first **backend
+milestone** of the ALPR-Based Smart Traffic Management System for Hawassa City.
+Webs and Apps sub-phases of Phase 1 will ship under `v0.2.0-phase1-webs` and
+`v1.0.0-phase1`.
+
+Highlights:
+
+- Production-ready FastAPI backend with cookie-session RBAC, audit logging,
+  Supabase storage for evidence, payment-request lifecycle, and HMAC-verified
+  payment-gateway callbacks
+- Self-hosted Supabase subset (Postgres 15, PostgREST, Storage API, imgproxy)
+  orchestrated via `compose.yaml` with healthchecks, separate DB roles, and
+  rotated secrets
+- Background worker with database outbox pattern for alerts and payment events
+- Full Phase 1 schema, migrations (alembic), seed reference data, and seeded
+  test users for every role
+- Test suite: 37 passing tests across unit, integration, and end-to-end HTTP
+  layers; CI runs ruff lint + format + pytest on every push and PR
+- Runtime smoke (`make smoke`) covering liveness, readiness, storage, evidence
+  upload+download round-trip, and login-page render
+- Backup and restore smoke (`make backup-smoke`) verifying 27 public/storage
+  tables round-trip through `pg_dump` / `pg_restore`
+- Documentation: API reference, payment-callback contract, Docker operations
+  and production deployment runbook, ADRs, and a Phase 1 master tracker with
+  all nine readiness gates marked Complete
+
+### Added
+
 - Formal repository structure
 - Archived original submission artifacts
 - Repository bootstrap documentation
