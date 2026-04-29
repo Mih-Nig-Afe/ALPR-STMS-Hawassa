@@ -106,7 +106,11 @@ services:
       - db_backups:/backups
       - ./infra/database/init/001-bootstrap-roles.sh:/docker-entrypoint-initdb.d/001-bootstrap-roles.sh:ro
     healthcheck:
-      test: ["CMD", "pg_isready", "-U", "postgres", "-h", "localhost"]
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U \"$${DB_APP_USER}\" -d \"$${POSTGRES_DB}\" -h localhost -p \"$${POSTGRES_PORT}\""
+        ]
       interval: 5s
       timeout: 5s
       retries: 10
@@ -129,7 +133,8 @@ services:
       PGRST_APP_SETTINGS_JWT_SECRET: ${JWT_SECRET}
       PGRST_APP_SETTINGS_JWT_EXP: ${JWT_EXPIRY}
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1:3000/"]
+      test:
+        ["CMD", "/usr/bin/sh", "-c", "read -r comm < /proc/1/comm && [ \"$$comm\" = \"postgrest\" ]"]
       interval: 10s
       timeout: 5s
       retries: 6
@@ -151,7 +156,11 @@ services:
       POSTGREST_URL: http://supabase-rest:3000
       AUTH_JWT_SECRET: ${JWT_SECRET}
       DATABASE_URL: ${STORAGE_DATABASE_URL}
-      DB_INSTALL_ROLES: "true"
+      DB_INSTALL_ROLES: "false"
+      DB_SUPER_USER: ${DB_STORAGE_USER}
+      DB_ANON_ROLE: anon
+      DB_AUTHENTICATED_ROLE: authenticated
+      DB_SERVICE_ROLE: service_role
       STORAGE_PUBLIC_URL: ${STORAGE_PUBLIC_URL}
       REQUEST_ALLOW_X_FORWARDED_PATH: "true"
       FILE_SIZE_LIMIT: 52428800
@@ -194,6 +203,7 @@ services:
   mailhog:
     container_name: alpr-stms-mailhog
     image: mailhog/mailhog:v1.0.1
+    platform: linux/amd64
     restart: unless-stopped
     ports:
       - "${MAILHOG_SMTP_PORT:-1025}:1025"
