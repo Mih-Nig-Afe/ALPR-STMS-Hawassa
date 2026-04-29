@@ -29,7 +29,28 @@
               </div>
               <div>
                 <label class="form-label" for="password">Password</label>
-                <input class="form-control" id="password" name="password" type="password" autocomplete="current-password" required>
+                <div class="input-group">
+                  <input class="form-control" id="password" name="password" type="password" autocomplete="current-password" required>
+                  <button
+                    class="btn btn-outline-secondary"
+                    type="button"
+                    id="toggle-password"
+                    aria-label="Show password"
+                    aria-pressed="false"
+                    aria-controls="password"
+                  >
+                    <span id="toggle-password-icon" aria-hidden="true">
+                      <svg id="icon-eye" xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8M1.173 8a13.1 13.1 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5s3.879 1.168 5.168 2.457A13.1 13.1 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5s-3.879-1.168-5.168-2.457A13.1 13.1 0 0 1 1.172 8z"/>
+                        <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5"/>
+                      </svg>
+                      <svg id="icon-eye-slash" xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16" style="display: none;">
+                        <path d="M13.359 11.238C14.695 10.082 15.5 8.75 15.5 8s-.805-2.082-2.141-3.238A13.1 13.1 0 0 0 8 2.5c-1.24 0-2.365.27-3.36.762l.757.757A8.8 8.8 0 0 1 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.1 13.1 0 0 1 14.828 8a13 13 0 0 1-1.052 1.472z"/>
+                        <path d="M11.297 9.176a3.5 3.5 0 0 0-4.473-4.473l.823.823a2.5 2.5 0 0 1 2.827 2.827zM4.98 6.353 3.926 5.3A13.1 13.1 0 0 0 1.172 8c.058.087.122.183.195.288.335.48.83 1.12 1.465 1.755C4.121 11.332 5.881 12.5 8 12.5c1.046 0 2.019-.206 2.914-.581l-.76-.76A6.8 6.8 0 0 1 8 11.5c-2.12 0-3.879-1.168-5.168-2.457A13.1 13.1 0 0 1 1.172 8a12.4 12.4 0 0 1 2.45-2.818l.857.857a3.5 3.5 0 0 0 4.482 4.482l.857.857A8.8 8.8 0 0 1 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.1 13.1 0 0 1 1.172 8a13.1 13.1 0 0 1 1.66-2.043l-.708-.708A14 14 0 0 0 .5 8c0 .917.956 2.45 2.5 3.751C4.545 13.05 6.229 14 8 14c1.294 0 2.518-.3 3.607-.844l1.54 1.54.707-.707-13-13-.707.707z"/>
+                      </svg>
+                    </span>
+                  </button>
+                </div>
               </div>
               <button class="btn btn-primary" type="submit">Sign in</button>
             </form>
@@ -44,6 +65,27 @@
         </div>
       </div>
     </main>
+    <script>
+      (() => {
+        const passwordInput = document.getElementById("password");
+        const toggleButton = document.getElementById("toggle-password");
+        const iconEye = document.getElementById("icon-eye");
+        const iconEyeSlash = document.getElementById("icon-eye-slash");
+        if (!(passwordInput instanceof HTMLInputElement) || !(toggleButton instanceof HTMLButtonElement)) {
+          return;
+        }
+        toggleButton.addEventListener("click", () => {
+          const showing = passwordInput.type === "text";
+          passwordInput.type = showing ? "password" : "text";
+          toggleButton.setAttribute("aria-pressed", showing ? "false" : "true");
+          toggleButton.setAttribute("aria-label", showing ? "Show password" : "Hide password");
+          if (iconEye instanceof SVGElement && iconEyeSlash instanceof SVGElement) {
+            iconEye.style.display = showing ? "" : "none";
+            iconEyeSlash.style.display = showing ? "none" : "";
+          }
+        });
+      })();
+    </script>
   </body>
 </html>
 
