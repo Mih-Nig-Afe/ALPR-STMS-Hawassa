@@ -34,6 +34,7 @@ def complaints_page(
             )
             .order_by(Complaint.created_at.desc())
         )
+        .unique()
         .scalars()
         .all()
     )

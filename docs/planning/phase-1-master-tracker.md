@@ -176,6 +176,7 @@
 | 2026-04-29 | Runtime smoke validation | Complete | `./scripts/smoke.sh` passed with liveness, readiness, storage health, and evidence upload/download |
 | 2026-04-29 | Backup and restore smoke | Complete | `./infra/deploy/scripts/backup-restore-smoke.sh` restored 27 public/storage tables into a temporary database |
 | 2026-04-29 | Expanded test suite | Complete | `docker compose run --rm api pytest tests/unit tests/integration` passed with 36 tests covering auth, audit, payment gateway, worker, workflow state machine, callback signing, and routes |
+| 2026-04-29 | End-to-end HTTP lifecycle | Complete | `docker compose run --rm api pytest tests/e2e tests/unit tests/integration` passed with 37 tests, including the lifecycle test that drives officer login, violation submission, alert acknowledgement, dispute, complaint confirmation, and signed gateway payment callback |
 
 ## 12. Risk and blocker register
 
@@ -210,6 +211,7 @@
 | 2026-04-29 | Tracker reconciled: schema, endpoint, and UI checklists marked Complete to match shipped state |
 | 2026-04-29 | HMAC-verified `POST /payments/callback` endpoint and gateway contract documentation shipped |
 | 2026-04-29 | Test coverage expanded to 36 passing tests covering RBAC, audit, payment gateway, worker, full workflow state machine, callback verification, and routes |
+| 2026-04-29 | End-to-end HTTP lifecycle test added; latent SQLAlchemy `InvalidRequestError` fixed in violations, complaints, and payments list/detail routes (added `.unique()` to joined-collection queries) |
 
 ## 15. Deployment readiness gate
 

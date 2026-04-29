@@ -41,6 +41,7 @@ def payments_page(
             )
             .order_by(PaymentRequest.requested_at.desc())
         )
+        .unique()
         .scalars()
         .all()
     )

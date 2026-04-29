@@ -26,3 +26,8 @@ All notable changes to this repository will be documented in this file.
 - Unit tests for RBAC dependencies (`require_user`, `require_roles`), audit and outbox helpers, and the worker's `process_batch` and `update_heartbeat`
 - Integration tests for the full violation lifecycle: report -> broadcast -> acknowledge -> stop outcome (admitted/disputed) -> complaint decide (confirm/revoke) -> simulated payment settlement
 - Test suite expanded from 7 to 36 passing tests against the live Docker stack
+- End-to-end test `tests/e2e/test_violation_lifecycle.py` that drives the full lifecycle through the HTTP API: officer login -> violation submission -> alert acknowledgement -> stop dispute -> complaint confirmation -> signed gateway payment callback -> paid state assertion
+
+### Fixed
+
+- `joinedload` queries against collection relationships in `/violations`, `/violations/{id}`, `/complaints`, and `/payments` now call `.unique()` on the result, fixing a latent SQLAlchemy `InvalidRequestError` raised when the routes returned violations, complaints, or payment requests with eager-loaded child rows
