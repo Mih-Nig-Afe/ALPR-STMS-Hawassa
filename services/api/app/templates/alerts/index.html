@@ -43,7 +43,7 @@
           <td class="text-end">
             {% if recipient.status != 'ACKNOWLEDGED' %}
             <form method="post" action="/alerts/{{ recipient.id }}/ack">
-              <button class="btn btn-sm btn-outline-primary" type="submit">Acknowledge</button>
+              <button class="btn btn-sm btn-outline-primary" type="submit" data-submit-once>Acknowledge</button>
             </form>
             {% else %}
             <span class="text-muted small">&#10003; Done</span>

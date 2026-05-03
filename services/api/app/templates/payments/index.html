@@ -43,12 +43,12 @@
           <td>
             {% if payment.status == 'REQUESTED' %}
             <form method="post" action="/payments/{{ payment.id }}/simulate" class="d-flex gap-2">
-              <select class="form-select form-select-sm" name="outcome" aria-label="Outcome">
+              <select class="form-select form-select-sm" name="outcome" aria-label="Outcome" required>
                 <option value="success">Success</option>
                 <option value="failed">Failed</option>
               </select>
-              <input class="form-control form-control-sm" name="notes" placeholder="Callback notes">
-              <button class="btn btn-sm btn-primary" type="submit">Apply</button>
+              <input class="form-control form-control-sm" name="notes" placeholder="Callback notes" aria-label="Callback notes" maxlength="500">
+              <button class="btn btn-sm btn-primary" type="submit" data-submit-once>Apply</button>
             </form>
             {% else %}
             <span class="text-muted small">Settled</span>

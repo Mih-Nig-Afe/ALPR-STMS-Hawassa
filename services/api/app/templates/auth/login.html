@@ -25,7 +25,7 @@
             <form method="post" action="/auth/login" class="d-grid gap-3">
               <div>
                 <label class="form-label" for="username">Username</label>
-                <input class="form-control" id="username" name="username" autocomplete="username" required>
+                <input class="form-control" id="username" name="username" autocomplete="username" autocapitalize="none" required autofocus>
               </div>
               <div>
                 <label class="form-label" for="password">Password</label>
@@ -52,7 +52,7 @@
                   </button>
                 </div>
               </div>
-              <button class="btn btn-primary" type="submit">Sign in</button>
+              <button class="btn btn-primary" type="submit" data-submit-once>Sign in</button>
             </form>
             <hr class="my-4">
             <div class="small text-muted">

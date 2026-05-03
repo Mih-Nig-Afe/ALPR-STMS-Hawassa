@@ -44,12 +44,12 @@
           <td>
             {% if complaint.status == 'OPEN' %}
             <form method="post" action="/complaints/{{ complaint.id }}/decision" class="d-grid gap-2">
-              <select class="form-select form-select-sm" name="decision" aria-label="Decision">
+              <select class="form-select form-select-sm" name="decision" aria-label="Decision" required>
                 <option value="confirm">Confirm violation</option>
                 <option value="revoke">Revoke violation</option>
               </select>
-              <input class="form-control form-control-sm" name="notes" placeholder="Decision notes">
-              <button class="btn btn-sm btn-primary" type="submit">Save</button>
+              <input class="form-control form-control-sm" name="notes" placeholder="Decision notes" aria-label="Decision notes" maxlength="500">
+              <button class="btn btn-sm btn-primary" type="submit" data-submit-once>Save</button>
             </form>
             {% else %}
             <span class="text-muted small">Decided</span>

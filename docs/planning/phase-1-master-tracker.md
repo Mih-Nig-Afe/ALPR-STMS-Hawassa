@@ -220,6 +220,8 @@
 | 2026-04-29 | Codebase reformatted with `ruff format`; ruff configured for FastAPI dependency-injection pattern; `.github/workflows/ci.yml` added as the CI quality gate (lint + format + full pytest in Docker Compose) |
 | 2026-04-29 | Phase 1 documentation set finalized: `docs/api/endpoints.md` API reference and production deployment runbook in `infra/deploy/docs/docker-operations.md`; README links updated |
 | 2026-04-29 | Storage client `ensure_bucket` hardened to recognise `supabase/storage-api` returning HTTP 400 with body `{statusCode:"404",error:"Bucket not found"}` so the bootstrap and runtime smoke create the bucket on first boot; `infra/deploy/scripts/backup-restore-smoke.sh` switched to `pg_restore --no-acl --no-owner` so the disposable validation database tolerates GRANTs against extension functions that are not pre-installed |
+| 2026-05-03 | Webs sub-phase tracker expanded with device geolocation UX, escape-path refinements, and a waitlist for route-aware alerts and a full codebase deep-dive report |
+| 2026-05-03 | Operator quickstart documented; Webs validation polish and location/routing notes recorded |
 
 ## 15. Deployment readiness gate
 
@@ -276,8 +278,10 @@ readiness gate in Section 15.
 | --- | --- | --- | --- |
 | P1-WEB-001 | Browser walkthrough and screenshot evidence for all shipped screens | Pending | `tests/e2e` or documented manual run covering login, dashboard, violations, alerts, complaints, payments |
 | P1-WEB-002 | Responsive and mobile layout pass for operational screens | Pending | Desktop and mobile screenshots with no layout overflow |
-| P1-WEB-003 | Form validation, empty states, and error page polish | Pending | Route tests plus visual review notes |
-| P1-WEB-004 | Operator-facing quickstart for seeded users and workflow demo | Pending | `docs/operations` or README-linked quickstart |
+| P1-WEB-003 | Form validation, empty states, and error page polish | In progress | Route tests plus visual review notes |
+| P1-WEB-004 | Operator-facing quickstart for seeded users and workflow demo | Complete | `docs/operations/phase-1-operator-quickstart.md` |
+| P1-WEB-005 | Reporting location auto-capture UX (device geolocation status and map recenter) | In progress | Visual review notes and screenshots |
+| P1-WEB-006 | Escape path UX refinements (clear/reset control, map defaults) | In progress | Visual review notes and screenshots |
 
 ### Apps/PWA Sub-Phase Work Items
 
@@ -286,3 +290,10 @@ readiness gate in Section 15.
 | P1-PWA-001 | Validate manifest and service worker install flow | Pending | Browser install proof and manifest check |
 | P1-PWA-002 | Mobile-first officer reporting walkthrough | Pending | Evidence upload, GPS capture, and submission flow on narrow viewport |
 | P1-PWA-003 | Offline/degraded-state handling for field reporting | Pending | Documented behavior when network/storage is unavailable |
+
+### Waitlist (Post-Webs / Post-PWA)
+
+| Item ID | Work item | Status | Notes |
+| --- | --- | --- | --- |
+| WL-001 | Full codebase deep-dive report and gap analysis | Waitlist | Prioritized after Webs sub-phase delivery |
+| WL-002 | Route-aware escape path (road snapping + multiple route alerts) with live officer device location | Waitlist | Requires map-matching service and location ingestion pipeline; see `docs/planning/location-routing-notes.md` |

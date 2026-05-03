@@ -44,7 +44,7 @@ Current Phase 1 progress:
 Phase 1 includes:
 - officer login and RBAC
 - manual violation reporting
-- GPS and timestamp capture
+- GPS and timestamp capture (device geolocation auto-fill for reporting)
 - alert broadcasting
 - complaint handling
 - payment request initiation
@@ -55,6 +55,12 @@ Phase 1 excludes:
 - ALPR/OCR processing
 - prediction engines
 - automated violation generation
+
+## Planned Enhancements (Waitlist)
+
+- road-snapped escape path drawing with multiple route alternatives
+- live officer device location capture to target high-priority alerts near predicted routes
+- map display tuning to keep the escape-path scale consistent with common mobile map expectations
 
 ## Primary Actors
 

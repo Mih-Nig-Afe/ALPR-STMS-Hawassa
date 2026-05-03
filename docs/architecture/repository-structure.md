@@ -35,6 +35,7 @@ Maintained project documentation.
 Subsections:
 - `architecture/`: repo and system structure decisions
 - `github/`: GitHub setup metadata and conventions
+- `operations/`: operator quickstarts and workflow guidance
 - `planning/`: the canonical Phase 1 tracker and execution aliases
 - `product/`: scope and business-level summaries
 - `references/`: indexes to preserved source materials

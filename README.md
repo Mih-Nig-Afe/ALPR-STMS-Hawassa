@@ -69,11 +69,13 @@ Phase 1 explicitly excludes:
 - Phase 1 execution pointer: [docs/planning/phase-1-execution-plan.md](docs/planning/phase-1-execution-plan.md)
 - API reference: [docs/api/endpoints.md](docs/api/endpoints.md)
 - Payment gateway callback contract: [docs/integrations/payment-callback.md](docs/integrations/payment-callback.md)
+- Operator quickstart: [docs/operations/phase-1-operator-quickstart.md](docs/operations/phase-1-operator-quickstart.md)
 - Docker operations and production runbook: [infra/deploy/docs/docker-operations.md](infra/deploy/docs/docker-operations.md)
 - ADR 001 stack decision: [docs/architecture/adr-001-phase1-stack.md](docs/architecture/adr-001-phase1-stack.md)
 - ADR 002 database decision: [docs/architecture/adr-002-database-choice.md](docs/architecture/adr-002-database-choice.md)
 - GitHub metadata: [docs/github/repository-metadata.md](docs/github/repository-metadata.md)
 - Source archive index: [docs/references/source-archive-index.md](docs/references/source-archive-index.md)
+- Location + routing waitlist: [docs/planning/location-routing-notes.md](docs/planning/location-routing-notes.md)
 
 ## Progress Path
 

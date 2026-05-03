@@ -31,17 +31,18 @@
         <div class="row g-3">
           <div class="col-md-6">
             <label class="form-label" for="vehicle_plate">Vehicle plate</label>
-            <input class="form-control" id="vehicle_plate" name="vehicle_plate" placeholder="ET-12345" required>
+            <input class="form-control" id="vehicle_plate" name="vehicle_plate" placeholder="ET-12345" required maxlength="32" autocapitalize="characters" autocomplete="off">
           </div>
           <div class="col-md-6">
             <label class="form-label" for="driver_phone_number">Driver phone</label>
-            <input class="form-control" id="driver_phone_number" name="driver_phone_number" placeholder="+2519...">
+            <input class="form-control" id="driver_phone_number" name="driver_phone_number" placeholder="+2519..." inputmode="tel" autocomplete="tel" maxlength="32">
           </div>
         </div>
 
         <div>
           <label class="form-label" for="location_text">Location description</label>
-          <input class="form-control" id="location_text" name="location_text" placeholder="Main road near..." required>
+          <input class="form-control" id="location_text" name="location_text" placeholder="Main road near..." required maxlength="255">
+          <div class="form-text" id="location-status" aria-live="polite">Device location will auto-fill when permission is granted.</div>
         </div>
 
         <div>
@@ -57,9 +58,12 @@
         <div>
           <div class="d-flex justify-content-between align-items-center mb-2">
             <label class="form-label mb-0">Escape path</label>
-            <span class="small text-muted">Tap points on the map to build the path.</span>
+            <span class="small text-muted" id="escape-path-help">Tap points on the map to build the path.</span>
           </div>
-          <div id="escape-path-map" class="map-panel"></div>
+          <div id="escape-path-map" class="map-panel" role="img" aria-label="Escape path map" aria-describedby="escape-path-help"></div>
+          <div class="d-flex justify-content-end mt-2">
+            <button class="btn btn-sm btn-outline-secondary" type="button" data-clear-path>Clear path</button>
+          </div>
         </div>
 
         <button class="btn btn-primary" type="submit" data-submit-once>Save and broadcast</button>
