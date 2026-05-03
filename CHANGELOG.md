@@ -8,11 +8,13 @@ All notable changes to this repository will be documented in this file.
 
 - `infra/deploy/scripts/first-boot.sh` and `make first-boot` one-shot bootstrap that runs env init, `docker compose up --build`, api healthcheck wait, `alembic upgrade head`, seed bootstrap, and the runtime smoke script
 - `scripts/smoke.sh` now also asserts that the proxy renders the login page (title and `<form>` present), catching template-render regressions in addition to the JSON health endpoints
+- Phase 1 master tracker Section 18 now records the assigned forward path: backend foundation complete, Webs active, Apps/PWA pending, pilot readiness pending
 
 ### Changed
 
 - `docs/planning/phase-1-master-tracker.md` Section 16 collapsed to a single solo-author signoff row recording approval of the backend release `v0.1.0-phase1`
-- README status block updated to mark Phase 1 backend `v0.1.0-phase1` as released and to advertise the `make first-boot` workflow
+- README status block updated to mark Phase 1 backend `v0.1.0-phase1` as released with 44/44 pytest and to advertise the `make first-boot` workflow
+- Product summary now mirrors the same progress path used by the canonical tracker so future work stays aligned
 - Admin, violations, alerts, complaints, and payments screens now share reusable template macros (`page_title`, `status_badge`, `empty_row`) for consistent table styling and status rendering
 - List routes for violations, alerts, complaints, and payments now support status filters and expose the active selection in the UI
 - HTML exception handling now renders a consistent dedicated error page for browser clients while API/health routes continue returning JSON responses

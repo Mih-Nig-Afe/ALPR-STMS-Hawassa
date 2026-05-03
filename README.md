@@ -8,7 +8,7 @@ Manual-enforcement-first traffic enforcement platform for Hawassa City, structur
 - Docker-first runtime baseline: complete
 - FastAPI service scaffold: complete
 - Self-hosted Supabase subset: complete
-- Phase 1 backend (`v0.1.0-phase1`): **released** — all nine readiness gates Complete (37/37 pytest, ruff clean, smoke green, backup-restore-smoke green); see [`docs/planning/phase-1-master-tracker.md`](docs/planning/phase-1-master-tracker.md)
+- Phase 1 backend (`v0.1.0-phase1`): **released** — all nine readiness gates Complete (44/44 pytest, ruff clean, smoke green, backup-restore-smoke green); see [`docs/planning/phase-1-master-tracker.md`](docs/planning/phase-1-master-tracker.md)
 - Phase 1 webs sub-phase: in progress
 - Phase 1 apps (PWA) sub-phase: pending
 - Continuous integration: lint + structure check + pytest on every push and pull request
@@ -74,6 +74,18 @@ Phase 1 explicitly excludes:
 - ADR 002 database decision: [docs/architecture/adr-002-database-choice.md](docs/architecture/adr-002-database-choice.md)
 - GitHub metadata: [docs/github/repository-metadata.md](docs/github/repository-metadata.md)
 - Source archive index: [docs/references/source-archive-index.md](docs/references/source-archive-index.md)
+
+## Progress Path
+
+The canonical path is tracked in [Section 18 of the Phase 1 master tracker](docs/planning/phase-1-master-tracker.md#18-assigned-progress-path):
+
+1. Phase 1 backend foundation: complete and released as `v0.1.0-phase1`
+2. Phase 1 Webs sub-phase: active next track for browser walkthroughs, responsive checks, and operator-facing UI polish
+3. Phase 1 Apps/PWA sub-phase: pending after Webs evidence is complete
+4. Pilot readiness package: pending after Webs and PWA checks are recorded
+
+Every implementation change should update the master tracker and any affected
+operator/API documentation before commit.
 
 ## Preserved Source Artifacts
 

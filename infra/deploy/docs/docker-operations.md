@@ -3,7 +3,7 @@
 ## Local bootstrap
 
 1. Copy `.env.example` to `.env`
-2. Run `make up`
+2. Run `make first-boot` for a full idempotent bootstrap, or `make up` when the stack is already migrated and seeded
 3. Open `http://localhost:8080`
 4. Open MailHog at `http://localhost:8025`
 

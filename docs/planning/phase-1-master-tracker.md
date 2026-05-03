@@ -9,7 +9,7 @@
 | Canonical tracker | `docs/planning/phase-1-master-tracker.md` |
 | Phase in scope | Phase 1 only |
 | Tracker effective date | 2026-04-29 |
-| Current milestone | Production-ready repository formalization and Docker-first baseline |
+| Current milestone | Phase 1 backend released; Webs sub-phase tracking active |
 | Baseline source archive | `archive/source-submission/` |
 | Delivery model | Docker Compose on a single Linux host for local, staging, and initial production |
 
@@ -180,7 +180,8 @@
 | 2026-04-29 | Lint and format gate | Complete | `docker compose run --rm api ruff check services tests` and `ruff format --check services tests` both clean across the entire codebase after `pyproject.toml` `flake8-bugbear` exemption for FastAPI dependency-injection helpers and project line-length raised to 120 |
 | 2026-04-29 | CI workflow live | Complete | `.github/workflows/ci.yml` orchestrates `ruff check`, `ruff format --check`, and the full `pytest` suite (unit + integration + e2e) inside the project's Docker Compose stack on every push to `main` and every pull request |
 | 2026-04-29 | Documentation gate | Complete | `docs/api/endpoints.md` enumerates every Phase 1 route and workflow state machine; `docs/integrations/payment-callback.md` defines the gateway contract; `infra/deploy/docs/docker-operations.md` carries a full single-host production runbook (host prep, secrets, TLS, first boot, backups, monitoring, upgrades, rollback) |
-| 2026-04-29 | Final validation gate | Complete | All four readiness gates re-run on a clean host: `pytest tests/unit tests/integration tests/e2e` reports 37 passed; `ruff check` and `ruff format --check` are clean; `make smoke` passes (api liveness, readiness, storage status, evidence upload + download); `make backup-smoke` restored 27 public/storage tables from a fresh dump |
+| 2026-04-29 | Final validation gate | Complete | All readiness gates re-run on a clean host: `pytest tests/unit tests/integration tests/e2e` reports 44 passed; `ruff check` and `ruff format --check` are clean; `make smoke` passes (api liveness, readiness, storage status, evidence upload + download); `make backup-smoke` restored 27 public/storage tables from a fresh dump |
+| 2026-05-03 | Documentation progress reconciliation | Complete | README, changelog, project summary, and this tracker were aligned around the assigned Phase 1 path: Backend release complete, Webs active, Apps/PWA pending |
 
 ## 12. Risk and blocker register
 
@@ -255,3 +256,33 @@ Record pilot findings here after first field deployment:
 - complaint turnaround time
 - payment callback issues
 - data quality issues
+
+## 18. Assigned Progress Path
+
+This section is the forward tracker for Phase 1 work after the backend release.
+Every future implementation change should update this section and the affected
+readiness gate in Section 15.
+
+| Sequence | Track | Status | Required evidence before moving forward |
+| --- | --- | --- | --- |
+| 1 | Phase 1 backend foundation | Complete | `v0.1.0-phase1`, 44/44 pytest, ruff clean, smoke green, backup-smoke green |
+| 2 | Phase 1 Webs sub-phase | In progress | Browser walkthroughs for admin, officer, complaint, alert, and payment screens; accessibility and responsive checks; updated API/UI docs |
+| 3 | Phase 1 Apps/PWA sub-phase | Pending | Installable PWA validation, offline/error-state checks, mobile evidence upload proof, field-user smoke script |
+| 4 | Pilot readiness package | Pending | Deployment checklist, operator quickstart, seeded-account rotation proof, post-pilot feedback template |
+
+### Webs Sub-Phase Work Items
+
+| Task ID | Work item | Status | Evidence target |
+| --- | --- | --- | --- |
+| P1-WEB-001 | Browser walkthrough and screenshot evidence for all shipped screens | Pending | `tests/e2e` or documented manual run covering login, dashboard, violations, alerts, complaints, payments |
+| P1-WEB-002 | Responsive and mobile layout pass for operational screens | Pending | Desktop and mobile screenshots with no layout overflow |
+| P1-WEB-003 | Form validation, empty states, and error page polish | Pending | Route tests plus visual review notes |
+| P1-WEB-004 | Operator-facing quickstart for seeded users and workflow demo | Pending | `docs/operations` or README-linked quickstart |
+
+### Apps/PWA Sub-Phase Work Items
+
+| Task ID | Work item | Status | Evidence target |
+| --- | --- | --- | --- |
+| P1-PWA-001 | Validate manifest and service worker install flow | Pending | Browser install proof and manifest check |
+| P1-PWA-002 | Mobile-first officer reporting walkthrough | Pending | Evidence upload, GPS capture, and submission flow on narrow viewport |
+| P1-PWA-003 | Offline/degraded-state handling for field reporting | Pending | Documented behavior when network/storage is unavailable |

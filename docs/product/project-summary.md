@@ -32,6 +32,15 @@ The system is designed as a four-phase platform:
 
 This repository is currently centered on **Phase 1** only.
 
+Current Phase 1 progress:
+
+| Track | Status | Notes |
+| --- | --- | --- |
+| Backend foundation | Complete | Released as `v0.1.0-phase1`; all readiness gates complete |
+| Webs sub-phase | In progress | Browser walkthrough, responsive checks, and operator UI polish are the active path |
+| Apps/PWA sub-phase | Pending | Starts after Webs evidence is recorded in the master tracker |
+| Pilot readiness | Pending | Starts after Webs and PWA checks are complete |
+
 Phase 1 includes:
 - officer login and RBAC
 - manual violation reporting
