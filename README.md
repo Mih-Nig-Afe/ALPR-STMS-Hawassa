@@ -70,6 +70,7 @@ Phase 1 explicitly excludes:
 - API reference: [docs/api/endpoints.md](docs/api/endpoints.md)
 - Payment gateway callback contract: [docs/integrations/payment-callback.md](docs/integrations/payment-callback.md)
 - Operator quickstart: [docs/operations/phase-1-operator-quickstart.md](docs/operations/phase-1-operator-quickstart.md)
+- Webs walkthrough evidence: [docs/operations/phase-1-webs-walkthrough.md](docs/operations/phase-1-webs-walkthrough.md)
 - Docker operations and production runbook: [infra/deploy/docs/docker-operations.md](infra/deploy/docs/docker-operations.md)
 - ADR 001 stack decision: [docs/architecture/adr-001-phase1-stack.md](docs/architecture/adr-001-phase1-stack.md)
 - ADR 002 database decision: [docs/architecture/adr-002-database-choice.md](docs/architecture/adr-002-database-choice.md)

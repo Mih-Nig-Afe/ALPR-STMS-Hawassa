@@ -221,7 +221,7 @@
 | 2026-04-29 | Phase 1 documentation set finalized: `docs/api/endpoints.md` API reference and production deployment runbook in `infra/deploy/docs/docker-operations.md`; README links updated |
 | 2026-04-29 | Storage client `ensure_bucket` hardened to recognise `supabase/storage-api` returning HTTP 400 with body `{statusCode:"404",error:"Bucket not found"}` so the bootstrap and runtime smoke create the bucket on first boot; `infra/deploy/scripts/backup-restore-smoke.sh` switched to `pg_restore --no-acl --no-owner` so the disposable validation database tolerates GRANTs against extension functions that are not pre-installed |
 | 2026-05-03 | Webs sub-phase tracker expanded with device geolocation UX, escape-path refinements, and a waitlist for route-aware alerts and a full codebase deep-dive report |
-| 2026-05-03 | Operator quickstart documented; Webs validation polish and location/routing notes recorded |
+| 2026-05-03 | Operator quickstart + Webs walkthrough evidence documented; responsive layout polish and validation updates in progress |
 
 ## 15. Deployment readiness gate
 
@@ -276,8 +276,8 @@ readiness gate in Section 15.
 
 | Task ID | Work item | Status | Evidence target |
 | --- | --- | --- | --- |
-| P1-WEB-001 | Browser walkthrough and screenshot evidence for all shipped screens | Pending | `tests/e2e` or documented manual run covering login, dashboard, violations, alerts, complaints, payments |
-| P1-WEB-002 | Responsive and mobile layout pass for operational screens | Pending | Desktop and mobile screenshots with no layout overflow |
+| P1-WEB-001 | Browser walkthrough and screenshot evidence for all shipped screens | In progress | `docs/operations/phase-1-webs-walkthrough.md` and screenshots under `docs/operations/screenshots/` |
+| P1-WEB-002 | Responsive and mobile layout pass for operational screens | In progress | CSS updates plus desktop/mobile screenshots with no layout overflow |
 | P1-WEB-003 | Form validation, empty states, and error page polish | In progress | Route tests plus visual review notes |
 | P1-WEB-004 | Operator-facing quickstart for seeded users and workflow demo | Complete | `docs/operations/phase-1-operator-quickstart.md` |
 | P1-WEB-005 | Reporting location auto-capture UX (device geolocation status and map recenter) | In progress | Visual review notes and screenshots |

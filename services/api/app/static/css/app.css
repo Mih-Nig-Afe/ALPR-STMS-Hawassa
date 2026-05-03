@@ -127,6 +127,11 @@ code {
   margin-bottom: 1rem;
 }
 
+.filter-bar .form-control,
+.filter-bar .form-select {
+  min-width: 180px;
+}
+
 .timeline {
   list-style: none;
   padding-left: 0;
@@ -153,6 +158,43 @@ code {
 @media (max-width: 991px) {
   .map-panel {
     min-height: 240px;
+  }
+}
+
+@media (max-width: 767px) {
+  .app-shell .panel,
+  .login-panel {
+    padding: 1rem;
+  }
+
+  .filter-bar {
+    align-items: stretch;
+  }
+
+  .filter-bar .form-control,
+  .filter-bar .form-select,
+  .filter-bar .btn,
+  .filter-bar .btn-link {
+    width: 100%;
+  }
+
+  .table {
+    font-size: 0.9rem;
+  }
+
+  .table td,
+  .table th {
+    white-space: normal;
+  }
+}
+
+@media (max-width: 575px) {
+  .map-panel {
+    min-height: 220px;
+  }
+
+  .display-value {
+    font-size: 1.6rem;
   }
 }
 
