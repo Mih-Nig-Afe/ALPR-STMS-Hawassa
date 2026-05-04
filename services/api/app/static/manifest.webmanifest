@@ -2,9 +2,27 @@
   "name": "ALPR STMS Hawassa",
   "short_name": "ALPR STMS",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#f4f7fb",
   "theme_color": "#1d4ed8",
-  "description": "Phase 1 traffic reporting, alerts, complaints, and payments."
+  "description": "Phase 1 traffic reporting, alerts, complaints, and payments.",
+  "icons": [
+    {
+      "src": "/static/images/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/static/images/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "/static/images/icon.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml"
+    }
+  ]
 }
 

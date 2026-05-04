@@ -1,8 +1,13 @@
-const CACHE_NAME = "alpr-stms-shell-v1";
+const CACHE_NAME = "alpr-stms-shell-v2";
 const SHELL_FILES = [
   "/static/css/app.css",
   "/static/js/app.js",
   "/static/js/violation-form.js",
+  "/manifest.webmanifest",
+  "/static/images/icon.svg",
+  "/static/images/icon-180.png",
+  "/static/images/icon-192.png",
+  "/static/images/icon-512.png",
 ];
 
 self.addEventListener("install", (event) => {
