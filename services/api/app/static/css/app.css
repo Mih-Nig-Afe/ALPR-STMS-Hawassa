@@ -196,6 +196,18 @@ code {
   .display-value {
     font-size: 1.6rem;
   }
+
+  .btn,
+  .btn-sm,
+  .form-control,
+  .form-select {
+    min-height: 44px;
+  }
+
+  .btn-sm {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+  }
 }
 
 @media print {

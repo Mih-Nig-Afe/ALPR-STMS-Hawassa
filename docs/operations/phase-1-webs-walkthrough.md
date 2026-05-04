@@ -9,7 +9,7 @@ filenames listed below.
 
 ## Environment
 
-- Date: 2026-05-03
+- Date: 2026-05-04
 - App URL: http://localhost:8080
 - Stack startup: `make first-boot`
 - Data seed: `python -m app.bootstrap`
@@ -82,6 +82,11 @@ Screenshot: `admin-dashboard.png`
 - Location auto-capture uses device geolocation with status feedback.
 - Escape path is captured as a GeoJSON LineString from map clicks.
 - Route-aware alerting and officer location targeting are waitlisted.
+
+## Run log
+
+- 2026-05-04: Walkthrough completed; all screenshots captured in `docs/operations/screenshots/`.
+- 2026-05-04: Location capture validated using a mocked browser geolocation during the walkthrough session.
 
 ## Screenshot checklist
 

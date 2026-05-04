@@ -182,6 +182,8 @@
 | 2026-04-29 | Documentation gate | Complete | `docs/api/endpoints.md` enumerates every Phase 1 route and workflow state machine; `docs/integrations/payment-callback.md` defines the gateway contract; `infra/deploy/docs/docker-operations.md` carries a full single-host production runbook (host prep, secrets, TLS, first boot, backups, monitoring, upgrades, rollback) |
 | 2026-04-29 | Final validation gate | Complete | All readiness gates re-run on a clean host: `pytest tests/unit tests/integration tests/e2e` reports 44 passed; `ruff check` and `ruff format --check` are clean; `make smoke` passes (api liveness, readiness, storage status, evidence upload + download); `make backup-smoke` restored 27 public/storage tables from a fresh dump |
 | 2026-05-03 | Documentation progress reconciliation | Complete | README, changelog, project summary, and this tracker were aligned around the assigned Phase 1 path: Backend release complete, Webs active, Apps/PWA pending |
+| 2026-05-04 | Webs UI smoke validation | Complete | `./scripts/smoke.sh` passed after the UI walkthrough and responsive pass |
+| 2026-05-04 | Unit, integration, and e2e tests | Complete | `docker compose run --rm api pytest tests/unit tests/integration tests/e2e -v` passed with 47 tests |
 
 ## 12. Risk and blocker register
 
@@ -222,6 +224,7 @@
 | 2026-04-29 | Storage client `ensure_bucket` hardened to recognise `supabase/storage-api` returning HTTP 400 with body `{statusCode:"404",error:"Bucket not found"}` so the bootstrap and runtime smoke create the bucket on first boot; `infra/deploy/scripts/backup-restore-smoke.sh` switched to `pg_restore --no-acl --no-owner` so the disposable validation database tolerates GRANTs against extension functions that are not pre-installed |
 | 2026-05-03 | Webs sub-phase tracker expanded with device geolocation UX, escape-path refinements, and a waitlist for route-aware alerts and a full codebase deep-dive report |
 | 2026-05-03 | Operator quickstart + Webs walkthrough evidence documented; responsive layout polish and validation updates in progress |
+| 2026-05-04 | Webs walkthrough screenshots captured; responsive tap targets tuned; mobile/desktop UI evidence added; tracker evidence refreshed |
 
 ## 15. Deployment readiness gate
 
@@ -234,7 +237,7 @@
 | Security | Session auth, RBAC, secrets separation, callback secret | Complete |
 | Evidence | Storage bucket reachable and upload path works | Complete |
 | Audit | State transitions write audit logs | Complete |
-| Testing | Smoke, unit, integration, and browser checks recorded | Complete |
+| Testing | Smoke, unit, integration, and browser checks recorded | Complete (Webs UI verified 2026-05-04) |
 | Operations | Backup and restore procedure verified | Complete |
 
 ## 16. Go-live signoff
@@ -276,8 +279,8 @@ readiness gate in Section 15.
 
 | Task ID | Work item | Status | Evidence target |
 | --- | --- | --- | --- |
-| P1-WEB-001 | Browser walkthrough and screenshot evidence for all shipped screens | In progress | `docs/operations/phase-1-webs-walkthrough.md` and screenshots under `docs/operations/screenshots/` |
-| P1-WEB-002 | Responsive and mobile layout pass for operational screens | In progress | CSS updates plus desktop/mobile screenshots with no layout overflow |
+| P1-WEB-001 | Browser walkthrough and screenshot evidence for all shipped screens | Complete | `docs/operations/phase-1-webs-walkthrough.md` and screenshots under `docs/operations/screenshots/` |
+| P1-WEB-002 | Responsive and mobile layout pass for operational screens | Complete | CSS updates plus desktop/mobile screenshots with no layout overflow |
 | P1-WEB-003 | Form validation, empty states, and error page polish | In progress | Route tests plus visual review notes |
 | P1-WEB-004 | Operator-facing quickstart for seeded users and workflow demo | Complete | `docs/operations/phase-1-operator-quickstart.md` |
 | P1-WEB-005 | Reporting location auto-capture UX (device geolocation status and map recenter) | In progress | Visual review notes and screenshots |
