@@ -225,6 +225,7 @@
 | 2026-05-03 | Webs sub-phase tracker expanded with device geolocation UX, escape-path refinements, and a waitlist for route-aware alerts and a full codebase deep-dive report |
 | 2026-05-03 | Operator quickstart + Webs walkthrough evidence documented; responsive layout polish and validation updates in progress |
 | 2026-05-04 | Webs walkthrough screenshots captured; responsive tap targets tuned; mobile/desktop UI evidence added; tracker evidence refreshed |
+| 2026-05-04 | Webs validation sweep documented; PWA manifest icons and service-worker cache updated for install checks |
 
 ## 15. Deployment readiness gate
 
@@ -271,7 +272,7 @@ readiness gate in Section 15.
 | Sequence | Track | Status | Required evidence before moving forward |
 | --- | --- | --- | --- |
 | 1 | Phase 1 backend foundation | Complete | `v0.1.0-phase1`, 44/44 pytest, ruff clean, smoke green, backup-smoke green |
-| 2 | Phase 1 Webs sub-phase | In progress | Browser walkthroughs for admin, officer, complaint, alert, and payment screens; accessibility and responsive checks; updated API/UI docs |
+| 2 | Phase 1 Webs sub-phase | Complete | Browser walkthroughs for admin, officer, complaint, alert, and payment screens; responsive checks; validation sweep documented |
 | 3 | Phase 1 Apps/PWA sub-phase | Pending | Installable PWA validation, offline/error-state checks, mobile evidence upload proof, field-user smoke script |
 | 4 | Pilot readiness package | Pending | Deployment checklist, operator quickstart, seeded-account rotation proof, post-pilot feedback template |
 
@@ -281,16 +282,16 @@ readiness gate in Section 15.
 | --- | --- | --- | --- |
 | P1-WEB-001 | Browser walkthrough and screenshot evidence for all shipped screens | Complete | `docs/operations/phase-1-webs-walkthrough.md` and screenshots under `docs/operations/screenshots/` |
 | P1-WEB-002 | Responsive and mobile layout pass for operational screens | Complete | CSS updates plus desktop/mobile screenshots with no layout overflow |
-| P1-WEB-003 | Form validation, empty states, and error page polish | In progress | Route tests plus visual review notes |
+| P1-WEB-003 | Form validation, empty states, and error page polish | Complete | `docs/operations/phase-1-webs-validation.md` |
 | P1-WEB-004 | Operator-facing quickstart for seeded users and workflow demo | Complete | `docs/operations/phase-1-operator-quickstart.md` |
-| P1-WEB-005 | Reporting location auto-capture UX (device geolocation status and map recenter) | In progress | Visual review notes and screenshots |
-| P1-WEB-006 | Escape path UX refinements (clear/reset control, map defaults) | In progress | Visual review notes and screenshots |
+| P1-WEB-005 | Reporting location auto-capture UX (device geolocation status and map recenter) | Complete | `docs/operations/phase-1-webs-validation.md` |
+| P1-WEB-006 | Escape path UX refinements (clear/reset control, map defaults) | Complete | `docs/operations/phase-1-webs-validation.md` |
 
 ### Apps/PWA Sub-Phase Work Items
 
 | Task ID | Work item | Status | Evidence target |
 | --- | --- | --- | --- |
-| P1-PWA-001 | Validate manifest and service worker install flow | Pending | Browser install proof and manifest check |
+| P1-PWA-001 | Validate manifest and service worker install flow | Complete | `docs/operations/phase-1-webs-validation.md` |
 | P1-PWA-002 | Mobile-first officer reporting walkthrough | Pending | Evidence upload, GPS capture, and submission flow on narrow viewport |
 | P1-PWA-003 | Offline/degraded-state handling for field reporting | Pending | Documented behavior when network/storage is unavailable |
 
