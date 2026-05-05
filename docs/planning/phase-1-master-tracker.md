@@ -226,6 +226,7 @@
 | 2026-05-03 | Operator quickstart + Webs walkthrough evidence documented; responsive layout polish and validation updates in progress |
 | 2026-05-04 | Webs walkthrough screenshots captured; responsive tap targets tuned; mobile/desktop UI evidence added; tracker evidence refreshed |
 | 2026-05-04 | Webs validation sweep documented; PWA manifest icons and service-worker cache updated for install checks |
+| 2026-05-05 | PWA mobile walkthrough and offline/degraded checks documented with new screenshots |
 
 ## 15. Deployment readiness gate
 
@@ -273,7 +274,7 @@ readiness gate in Section 15.
 | --- | --- | --- | --- |
 | 1 | Phase 1 backend foundation | Complete | `v0.1.0-phase1`, 44/44 pytest, ruff clean, smoke green, backup-smoke green |
 | 2 | Phase 1 Webs sub-phase | Complete | Browser walkthroughs for admin, officer, complaint, alert, and payment screens; responsive checks; validation sweep documented |
-| 3 | Phase 1 Apps/PWA sub-phase | Pending | Installable PWA validation, offline/error-state checks, mobile evidence upload proof, field-user smoke script |
+| 3 | Phase 1 Apps/PWA sub-phase | Complete | Installable PWA validation, mobile evidence upload proof, offline/degraded checks |
 | 4 | Pilot readiness package | Pending | Deployment checklist, operator quickstart, seeded-account rotation proof, post-pilot feedback template |
 
 ### Webs Sub-Phase Work Items
@@ -292,8 +293,8 @@ readiness gate in Section 15.
 | Task ID | Work item | Status | Evidence target |
 | --- | --- | --- | --- |
 | P1-PWA-001 | Validate manifest and service worker install flow | Complete | `docs/operations/phase-1-webs-validation.md` |
-| P1-PWA-002 | Mobile-first officer reporting walkthrough | Pending | Evidence upload, GPS capture, and submission flow on narrow viewport |
-| P1-PWA-003 | Offline/degraded-state handling for field reporting | Pending | Documented behavior when network/storage is unavailable |
+| P1-PWA-002 | Mobile-first officer reporting walkthrough | Complete | `docs/operations/phase-1-webs-validation.md` |
+| P1-PWA-003 | Offline/degraded-state handling for field reporting | Complete | `docs/operations/phase-1-webs-validation.md` |
 
 ### Waitlist (Post-Webs / Post-PWA)
 

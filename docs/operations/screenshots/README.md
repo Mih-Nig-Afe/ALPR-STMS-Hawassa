@@ -2,3 +2,6 @@
 
 Place walkthrough screenshots here using the filenames listed in
 `docs/operations/phase-1-webs-walkthrough.md`.
+
+PWA validation screenshots are listed in
+`docs/operations/phase-1-webs-validation.md`.

@@ -3,12 +3,12 @@
 ## Purpose
 
 This document records the manual validation sweep for the Phase 1 Webs sub-phase
-and the initial PWA install checks. It is the evidence log for P1-WEB-003,
-P1-WEB-005, P1-WEB-006, and P1-PWA-001.
+and the PWA checks. It is the evidence log for P1-WEB-003, P1-WEB-005,
+P1-WEB-006, P1-PWA-001, P1-PWA-002, and P1-PWA-003.
 
 ## Environment
 
-- Date: 2026-05-04
+- Dates: 2026-05-04, 2026-05-05
 - App URL: http://localhost:8080
 - Stack startup: `make first-boot`
 - Data seed: `python -m app.bootstrap`
@@ -62,3 +62,17 @@ docker compose exec -T supabase-db psql -U postgres -d postgres -c "select id, r
 - Service worker registers and activates with scope `/`.
 - Cache `alpr-stms-shell-v2` includes the manifest and icon assets after reload.
 - Install prompt could not be forced in the headless run; only registration and asset checks were validated.
+
+## P1-PWA-002: Mobile-first officer reporting walkthrough
+
+- Viewport set to 390x844 and logged in as `traffic.officer1`.
+- Submitted a violation with evidence upload, escape path points, and notes.
+- Evidence thumbnail renders on the detail screen after submission.
+- Screenshots captured: `pwa-violations-form.png`, `pwa-violations-detail.png`.
+
+## P1-PWA-003: Offline and degraded-state checks
+
+- Offline navigation to `/violations` fails with browser-level `net::ERR_FAILED`.
+- Offline submission attempt fails with `net::ERR_INTERNET_DISCONNECTED`.
+- Map tile requests abort while offline, so the map surface does not render.
+- Headless offline error screenshot rendered blank; file stored as `pwa-offline-error.png`.
