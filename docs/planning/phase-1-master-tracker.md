@@ -303,3 +303,16 @@ readiness gate in Section 15.
 | --- | --- | --- | --- |
 | WL-001 | Full codebase deep-dive report and gap analysis | Waitlist | Prioritized after Webs sub-phase delivery |
 | WL-002 | Route-aware escape path (road snapping + multiple route alerts) with live officer device location | Waitlist | Requires map-matching service and location ingestion pipeline; see `docs/planning/location-routing-notes.md` |
+
+### 2026-05-05 Multi-Feature Enhancement Batch
+
+| Item ID | Enhancement | Status | Evidence target |
+| --- | --- | --- | --- |
+| P1-PWA-004 | Install prompt banner UX and console evidence logging | In progress | Chrome installability check with console evidence lines from `pwa-install.js` |
+| P1-PWA-005 | Service-worker resilient cache strategy with `.catch()` offline fallback | In progress | Manual offline navigation checks and cache inspection |
+| P1-AUTH-002 | New seeded credential convention (`TPx/SCx/COx/ADMIN1`) | In progress | Bootstrap rerun and login checks across seeded accounts |
+| P1-ADM-002 | Admin user management UI and actions (create/toggle/reset) | In progress | Admin workflow test + browser walkthrough |
+| P1-VIO-002 | Traffic dashboard tab split (active/reported/intercepted) | In progress | Officer walkthrough screenshots and route checks |
+| P1-ALT-002 | Radius-based nearby officer high-alert broadcasting | In progress | Workflow tests proving recipient selection + high-alert marker |
+| P1-GEO-002 | Location description optional backup field | In progress | Form submission without location text and helper text validation |
+| P1-OPS-002 | ngrok startup helper exposing cross-device URL | In progress | Terminal output showing public URL |

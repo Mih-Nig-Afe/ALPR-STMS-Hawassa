@@ -10,7 +10,7 @@ from app.auth.dependencies import get_current_user_optional
 from app.core.config import get_settings
 from app.core.templating import templates
 from app.db.session import get_db
-from app.routers import admin, alerts, auth, complaints, home, payments, violations
+from app.routers import admin, alerts, api, auth, complaints, home, payments, violations
 
 settings = get_settings()
 app = FastAPI(title=settings.app_name, debug=settings.app_debug)
@@ -20,6 +20,7 @@ app.mount("/static", StaticFiles(directory=str(Path(__file__).resolve().parent /
 app.include_router(home.router)
 app.include_router(auth.router)
 app.include_router(violations.router)
+app.include_router(api.router)
 app.include_router(alerts.router)
 app.include_router(complaints.router)
 app.include_router(payments.router)

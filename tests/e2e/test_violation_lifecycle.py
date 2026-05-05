@@ -122,7 +122,7 @@ def test_full_violation_lifecycle_through_http(lifecycle_context) -> None:
 
     with TestClient(app) as client:
         # 1. Officer logs in and submits a violation
-        _login(client, "traffic.officer1", settings.officer_default_password)
+        _login(client, "TP1", settings.officer_default_password)
         submit = client.post(
             "/violations",
             data={
@@ -149,14 +149,14 @@ def test_full_violation_lifecycle_through_http(lifecycle_context) -> None:
                 db.execute(select(ViolationAlert).where(ViolationAlert.violation_id == violation_id)).scalars().one()
             )
             recipients = db.execute(select(AlertRecipient).where(AlertRecipient.alert_id == alert.id)).scalars().all()
-            subcity_recipient = next(r for r in recipients if db.get(User, r.user_id).username == "subcity.central")
+            subcity_recipient = next(r for r in recipients if db.get(User, r.user_id).username == "SC1")
             recipient_id = subcity_recipient.id
-        _login(client, "subcity.central", settings.subcity_default_password)
+        _login(client, "SC1", settings.subcity_default_password)
         ack = client.post(f"/alerts/{recipient_id}/ack", follow_redirects=False)
         assert ack.status_code == 303, ack.text
 
         # 4. Officer marks the stop outcome as disputed, opening a complaint
-        _login(client, "traffic.officer1", settings.officer_default_password)
+        _login(client, "TP1", settings.officer_default_password)
         dispute = client.post(
             f"/violations/{violation_id}/stop-outcome",
             data={"outcome": "disputed", "notes": "driver disputes"},
@@ -170,7 +170,7 @@ def test_full_violation_lifecycle_through_http(lifecycle_context) -> None:
             complaint_id = complaint.id
 
         # 5. Complaint officer logs in and confirms the complaint
-        _login(client, "complaints.officer", settings.complaint_default_password)
+        _login(client, "CO1", settings.complaint_default_password)
         decide = client.post(
             f"/complaints/{complaint_id}/decision",
             data={"decision": "confirm", "notes": "evidence supports citation"},

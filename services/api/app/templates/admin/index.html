@@ -58,6 +58,7 @@
               <th scope="col">Subcity</th>
               <th scope="col">Active</th>
               <th scope="col">Joined</th>
+              <th scope="col" class="text-end">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -75,9 +76,22 @@
                 {% endif %}
               </td>
               <td>{{ datetime_iso(user.created_at) }}</td>
+              <td class="text-end">
+                <div class="d-flex flex-wrap justify-content-end gap-2">
+                  <form method="post" action="/admin/users/{{ user.id }}/toggle-active">
+                    <button class="btn btn-sm btn-outline-secondary" type="submit" data-submit-once>
+                      {{ "Disable" if user.is_active else "Enable" }}
+                    </button>
+                  </form>
+                  <form method="post" action="/admin/users/{{ user.id }}/reset-password" class="d-flex gap-1">
+                    <input class="form-control form-control-sm" style="max-width: 180px" name="password" type="text" placeholder="new password" required>
+                    <button class="btn btn-sm btn-outline-primary" type="submit" data-submit-once>Reset</button>
+                  </form>
+                </div>
+              </td>
             </tr>
             {% else %}
-            {{ empty_row(6, 'No users yet.') }}
+            {{ empty_row(7, 'No users yet.') }}
             {% endfor %}
           </tbody>
         </table>
@@ -86,6 +100,56 @@
   </div>
 
   <div class="col-xl-5">
+    <section class="panel mb-4">
+      <div class="panel-header">
+        <h2 class="h5 mb-1">Create user</h2>
+        <p class="text-muted mb-0">Provision operational accounts without leaving the dashboard.</p>
+      </div>
+      <form method="post" action="/admin/users" class="d-grid gap-3">
+        <div class="row g-2">
+          <div class="col-6">
+            <label class="form-label" for="new-username">Username</label>
+            <input class="form-control" id="new-username" name="username" placeholder="TP4" required>
+          </div>
+          <div class="col-6">
+            <label class="form-label" for="new-full-name">Full name</label>
+            <input class="form-control" id="new-full-name" name="full_name" placeholder="Traffic Police Officer 4" required>
+          </div>
+        </div>
+        <div class="row g-2">
+          <div class="col-6">
+            <label class="form-label" for="new-role">Role</label>
+            <select class="form-select" id="new-role" name="role_id" required>
+              <option value="">Select role</option>
+              {% for role in roles %}
+              <option value="{{ role.id }}">{{ role.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-6">
+            <label class="form-label" for="new-subcity">Subcity</label>
+            <select class="form-select" id="new-subcity" name="subcity_id">
+              <option value="">No default subcity</option>
+              {% for subcity in subcities %}
+              <option value="{{ subcity.id }}">{{ subcity.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+        <div class="row g-2">
+          <div class="col-6">
+            <label class="form-label" for="new-password">Password</label>
+            <input class="form-control" id="new-password" name="password" placeholder="tp4alprstms" required>
+          </div>
+          <div class="col-6">
+            <label class="form-label" for="new-phone">Phone</label>
+            <input class="form-control" id="new-phone" name="phone_number" placeholder="+2519...">
+          </div>
+        </div>
+        <button class="btn btn-primary" type="submit" data-submit-once>Create user</button>
+      </form>
+    </section>
+
     <section class="panel">
       <div class="panel-header">
         <h2 class="h5 mb-1">Subcities</h2>

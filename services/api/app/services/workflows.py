@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import math
 from dataclasses import dataclass
 from decimal import Decimal
 from uuid import uuid4
@@ -19,6 +20,7 @@ from alpr_stms_shared.constants import (
     PAYMENT_STATUS_REQUESTED,
     ROLE_SUBCITY_OFFICER,
     ROLE_SYSTEM_ADMIN,
+    ROLE_TRAFFIC_OFFICER,
     VIOLATION_STATUS_BROADCASTED,
     VIOLATION_STATUS_PAID,
     VIOLATION_STATUS_PAYMENT_PENDING,
@@ -27,8 +29,10 @@ from alpr_stms_shared.constants import (
     VIOLATION_STATUS_UNDER_COMPLAINT,
 )
 from app.core.security import utcnow
+from app.core.security import hash_password
 from app.models.domain import (
     AlertRecipient,
+    OfficerLocation,
     Complaint,
     ComplaintDecision,
     PaymentRequest,
@@ -42,13 +46,15 @@ from app.models.domain import (
 from app.services.audit import append_audit, enqueue_event
 from app.storage.client import StorageClient
 
+NEARBY_OFFICER_RADIUS_KM = 5.0
+
 
 @dataclass
 class ViolationInput:
     rule_id: str
     vehicle_plate: str
     driver_phone_number: str | None
-    location_text: str
+    location_text: str | None
     latitude: str | None
     longitude: str | None
     escape_path_geojson: str | None
@@ -65,17 +71,71 @@ def _parse_geojson(raw: str | None) -> dict | None:
         return {"raw": raw}
 
 
-def _recipient_users(db: Session, actor: User) -> list[User]:
-    return (
+def _to_float(value: str | None) -> float | None:
+    if value is None:
+        return None
+    try:
+        return float(value)
+    except ValueError:
+        return None
+
+
+def _distance_km(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
+    r = 6371.0
+    d_lat = math.radians(lat2 - lat1)
+    d_lon = math.radians(lon2 - lon1)
+    a = (
+        math.sin(d_lat / 2) ** 2
+        + math.cos(math.radians(lat1)) * math.cos(math.radians(lat2)) * math.sin(d_lon / 2) ** 2
+    )
+    return 2 * r * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+
+
+def _recipient_users(db: Session, actor: User, *, latitude: str | None, longitude: str | None) -> tuple[list[User], bool]:
+    fixed_roles = (
         db.execute(
             select(User)
             .options(joinedload(User.role))
             .where(User.is_active.is_(True))
+            .where(User.id != actor.id)
             .where(User.role.has(code=ROLE_SYSTEM_ADMIN) | User.role.has(code=ROLE_SUBCITY_OFFICER))
         )
         .scalars()
         .all()
     )
+    center_lat = _to_float(latitude)
+    center_lon = _to_float(longitude)
+    nearby_officers: list[User] = []
+    is_high_alert = False
+    if center_lat is not None and center_lon is not None:
+        latest_locations = (
+            db.execute(
+                select(OfficerLocation)
+                .join(User, OfficerLocation.user_id == User.id)
+                .where(User.is_active.is_(True))
+                .where(User.id != actor.id)
+                .where(User.role.has(code=ROLE_TRAFFIC_OFFICER))
+                .order_by(OfficerLocation.user_id, OfficerLocation.captured_at.desc())
+            )
+            .scalars()
+            .all()
+        )
+        seen_users: set[str] = set()
+        for location in latest_locations:
+            if location.user_id in seen_users:
+                continue
+            seen_users.add(location.user_id)
+            lat = _to_float(location.latitude)
+            lon = _to_float(location.longitude)
+            if lat is None or lon is None:
+                continue
+            if _distance_km(center_lat, center_lon, lat, lon) <= NEARBY_OFFICER_RADIUS_KM:
+                officer = db.get(User, location.user_id)
+                if officer is not None:
+                    nearby_officers.append(officer)
+        is_high_alert = len(nearby_officers) > 0
+    recipients_by_id = {user.id: user for user in [*fixed_roles, *nearby_officers]}
+    return list(recipients_by_id.values()), is_high_alert
 
 
 def _ensure_payment_request(db: Session, actor: User, violation: Violation) -> PaymentRequest:
@@ -137,7 +197,7 @@ def create_violation(
         driver_phone_number=payload.driver_phone_number,
         status=VIOLATION_STATUS_REPORTED,
         draft_penalty_amount=Decimal(rule.penalty_amount),
-        location_text=payload.location_text.strip(),
+        location_text=(payload.location_text or "").strip() or None,
         latitude=payload.latitude,
         longitude=payload.longitude,
         escape_path_geojson=_parse_geojson(payload.escape_path_geojson),
@@ -185,16 +245,18 @@ def create_violation(
             details={"filename": evidence_filename},
         )
 
+    recipients, is_high_alert = _recipient_users(db, actor, latitude=payload.latitude, longitude=payload.longitude)
+    level_prefix = "[HIGH ALERT] " if is_high_alert else ""
     alert = ViolationAlert(
         id=str(uuid4()),
         violation_id=violation.id,
-        message=f"Violation {violation.reference_code} reported in {actor.default_subcity.name}",
+        message=f"{level_prefix}Violation {violation.reference_code} reported in {actor.default_subcity.name}",
         created_by_user_id=actor.id,
         created_at=utcnow(),
     )
     db.add(alert)
     db.flush()
-    for recipient in _recipient_users(db, actor):
+    for recipient in recipients:
         db.add(
             AlertRecipient(
                 id=str(uuid4()),
@@ -223,6 +285,83 @@ def create_violation(
     db.commit()
     db.refresh(violation)
     return violation
+
+
+def create_user_account(
+    db: Session,
+    *,
+    actor: User,
+    username: str,
+    full_name: str,
+    password: str,
+    role_id: str,
+    subcity_id: str | None,
+    phone_number: str | None,
+) -> User:
+    if actor.role.code != ROLE_SYSTEM_ADMIN:
+        raise PermissionError("Only admins can create users")
+    existing = db.execute(select(User).where(User.username == username)).scalars().first()
+    if existing is not None:
+        raise ValueError("Username already exists")
+    user = User(
+        id=str(uuid4()),
+        username=username.upper().strip(),
+        full_name=full_name.strip(),
+        phone_number=(phone_number or "").strip() or None,
+        password_hash=hash_password(password),
+        role_id=role_id,
+        default_subcity_id=subcity_id,
+        is_active=True,
+        created_at=utcnow(),
+    )
+    db.add(user)
+    db.flush()
+    append_audit(
+        db,
+        actor=actor,
+        action="user.created",
+        entity_type="user",
+        entity_id=user.id,
+        details={"username": user.username, "role_id": role_id},
+    )
+    db.commit()
+    return user
+
+
+def toggle_user_account_active(db: Session, *, actor: User, user_id: str) -> None:
+    if actor.role.code != ROLE_SYSTEM_ADMIN:
+        raise PermissionError("Only admins can toggle users")
+    user = db.get(User, user_id)
+    if user is None:
+        raise ValueError("User not found")
+    user.is_active = not user.is_active
+    append_audit(
+        db,
+        actor=actor,
+        action="user.toggled",
+        entity_type="user",
+        entity_id=user.id,
+        details={"is_active": user.is_active},
+    )
+    db.commit()
+
+
+def reset_user_account_password(db: Session, *, actor: User, user_id: str, password: str) -> None:
+    if actor.role.code != ROLE_SYSTEM_ADMIN:
+        raise PermissionError("Only admins can reset passwords")
+    user = db.get(User, user_id)
+    if user is None:
+        raise ValueError("User not found")
+    user.password_hash = hash_password(password)
+    append_audit(
+        db,
+        actor=actor,
+        action="user.password_reset",
+        entity_type="user",
+        entity_id=user.id,
+        details={"username": user.username},
+    )
+    db.commit()
 
 
 def acknowledge_alert(db: Session, *, actor: User, recipient_id: str) -> None:

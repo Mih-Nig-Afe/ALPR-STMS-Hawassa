@@ -111,6 +111,7 @@ def _upsert_user(
         user.full_name = full_name
         user.role_id = role.id
         user.default_subcity_id = subcity.id if subcity else None
+        user.password_hash = hash_password(password)
         user.is_active = True
     db.flush()
     return user
@@ -150,47 +151,32 @@ def run_bootstrap() -> None:
         central = subcities["central-hawassa"]
         east = subcities["east-hawassa"]
 
-        officer = _upsert_user(
-            db,
-            username="traffic.officer1",
-            full_name="Traffic Officer One",
-            role=roles[ROLE_TRAFFIC_OFFICER],
-            subcity=central,
-            password=settings.officer_default_password,
-            phone_number="+251900000001",
-        )
-        subcity_officer = _upsert_user(
-            db,
-            username="subcity.central",
-            full_name="Central Subcity Officer",
-            role=roles[ROLE_SUBCITY_OFFICER],
-            subcity=central,
-            password=settings.subcity_default_password,
-            phone_number="+251900000002",
-        )
-        complaint_officer = _upsert_user(
-            db,
-            username="complaints.officer",
-            full_name="Complaint Officer",
-            role=roles[ROLE_COMPLAINT_OFFICER],
-            subcity=east,
-            password=settings.complaint_default_password,
-            phone_number="+251900000003",
-        )
-        admin = _upsert_user(
-            db,
-            username="sys.admin",
-            full_name="System Administrator",
-            role=roles[ROLE_SYSTEM_ADMIN],
-            subcity=central,
-            password=settings.admin_default_password,
-            phone_number="+251900000004",
-        )
+        users_to_seed = [
+            ("TP1", "Traffic Police Officer 1", roles[ROLE_TRAFFIC_OFFICER], central, "tp1alprstms", "+251900000001"),
+            ("TP2", "Traffic Police Officer 2", roles[ROLE_TRAFFIC_OFFICER], central, "tp2alprstms", "+251900000002"),
+            ("TP3", "Traffic Police Officer 3", roles[ROLE_TRAFFIC_OFFICER], east, "tp3alprstms", "+251900000003"),
+            ("SC1", "Subcity Officer 1", roles[ROLE_SUBCITY_OFFICER], central, "sc1alprstms", "+251900000004"),
+            ("SC2", "Subcity Officer 2", roles[ROLE_SUBCITY_OFFICER], east, "sc2alprstms", "+251900000005"),
+            ("CO1", "Complaint Officer 1", roles[ROLE_COMPLAINT_OFFICER], central, "co1alprstms", "+251900000006"),
+            ("CO2", "Complaint Officer 2", roles[ROLE_COMPLAINT_OFFICER], east, "co2alprstms", "+251900000007"),
+            ("ADMIN1", "System Administrator", roles[ROLE_SYSTEM_ADMIN], central, "admin1alprstms", "+251900000008"),
+        ]
 
-        _ensure_assignment(db, user=officer, subcity=central, title="Traffic Officer")
-        _ensure_assignment(db, user=subcity_officer, subcity=central, title="Subcity Officer")
-        _ensure_assignment(db, user=complaint_officer, subcity=east, title="Complaint Officer")
-        _ensure_assignment(db, user=admin, subcity=central, title="System Administrator")
+        seeded_users: list[tuple[User, Subcity, str]] = []
+        for username, full_name, role, subcity, password, phone in users_to_seed:
+            user = _upsert_user(
+                db,
+                username=username,
+                full_name=full_name,
+                role=role,
+                subcity=subcity,
+                password=password,
+                phone_number=phone,
+            )
+            seeded_users.append((user, subcity, role.name))
+
+        for user, subcity, title in seeded_users:
+            _ensure_assignment(db, user=user, subcity=subcity, title=title)
         db.commit()
 
     client = StorageClient()

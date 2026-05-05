@@ -1,83 +1,105 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#1d4ed8">
-    <meta name="description" content="ALPR STMS Hawassa - manual-enforcement-first traffic management.">
-    <title>{% block title %}{{ settings.app_name }}{% endblock %}</title>
-    <link rel="manifest" href="/manifest.webmanifest">
-    <link rel="icon" type="image/svg+xml" href="/static/images/icon.svg">
-    <link rel="apple-touch-icon" href="/static/images/icon-180.png">
-    <link rel="stylesheet" href="/static/vendor/bootstrap/bootstrap.min.css">
-    <link rel="stylesheet" href="/static/vendor/leaflet/leaflet.css">
-    <link rel="stylesheet" href="/static/css/app.css">
-  </head>
-  {% set role_code = (current_user.role.code if current_user else '') %}
-  <body class="app-shell" data-role="{{ role_code }}" data-tiles="{{ settings.map_tile_url }}">
-    <a class="visually-hidden-focusable skip-link" href="#main-content">Skip to main content</a>
-    <header class="border-bottom bg-white sticky-top">
-      <nav class="navbar navbar-expand-lg navbar-light container py-2" aria-label="Primary">
-        <a class="navbar-brand fw-semibold" href="/">
-          <span aria-hidden="true">&#9873;</span> ALPR STMS
-        </a>
-        {% if current_user %}
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu" aria-controls="navMenu" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navMenu">
-          <ul class="navbar-nav me-auto">
-            {% if role_code in ('traffic_officer', 'system_admin') %}
-            <li class="nav-item"><a class="nav-link {% if request.url.path.startswith('/violations') %}active{% endif %}" href="/violations">Violations</a></li>
-            {% endif %}
-            <li class="nav-item"><a class="nav-link {% if request.url.path.startswith('/alerts') %}active{% endif %}" href="/alerts">Alerts</a></li>
-            {% if role_code in ('complaint_officer', 'system_admin') %}
-            <li class="nav-item"><a class="nav-link {% if request.url.path.startswith('/complaints') %}active{% endif %}" href="/complaints">Complaints</a></li>
-            <li class="nav-item"><a class="nav-link {% if request.url.path.startswith('/payments') %}active{% endif %}" href="/payments">Payments</a></li>
-            {% endif %}
-            {% if role_code == 'system_admin' %}
-            <li class="nav-item"><a class="nav-link {% if request.url.path.startswith('/admin') %}active{% endif %}" href="/admin">Admin</a></li>
-            {% endif %}
-          </ul>
-          <div class="d-flex align-items-center gap-3">
-            <div class="small text-end">
-              <div class="fw-semibold">{{ current_user.full_name }}</div>
-              <div class="text-muted">{{ current_user.role.name }}</div>
-            </div>
-            <form method="post" action="/auth/logout">
-              <button class="btn btn-outline-secondary btn-sm" type="submit">Sign out</button>
-            </form>
-          </div>
-        </div>
-        {% endif %}
-      </nav>
-    </header>
 
-    <main id="main-content" class="container py-4" tabindex="-1">
-      {% set notice = request.query_params.get('notice') %}
-      {% if notice %}
-      <div class="alert alert-{{ request.query_params.get('notice_level', 'info') }} alert-dismissible fade show mb-4" role="status">
-        {{ notice }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Dismiss"></button>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#1d4ed8">
+  <meta name="description" content="ALPR STMS Hawassa - manual-enforcement-first traffic management.">
+  <title>{% block title %}{{ settings.app_name }}{% endblock %}</title>
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="icon" type="image/svg+xml" href="/static/images/icon.svg">
+  <link rel="apple-touch-icon" href="/static/images/icon-180.png">
+  <link rel="stylesheet" href="/static/vendor/bootstrap/bootstrap.min.css">
+  <link rel="stylesheet" href="/static/vendor/leaflet/leaflet.css">
+  <link rel="stylesheet" href="/static/css/app.css">
+</head>
+{% set role_code = (current_user.role.code if current_user else '') %}
+
+<body class="app-shell" data-role="{{ role_code }}" data-tiles="{{ settings.map_tile_url }}">
+  <a class="visually-hidden-focusable skip-link" href="#main-content">Skip to main content</a>
+  <header class="border-bottom bg-white sticky-top">
+    <nav class="navbar navbar-expand-lg navbar-light container py-2" aria-label="Primary">
+      <a class="navbar-brand fw-semibold" href="/">
+        <span aria-hidden="true">&#9873;</span> ALPR STMS
+      </a>
+      {% if current_user %}
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu"
+        aria-controls="navMenu" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navMenu">
+        <ul class="navbar-nav me-auto">
+          {% if role_code in ('traffic_officer', 'system_admin') %}
+          <li class="nav-item"><a class="nav-link {% if request.url.path.startswith('/violations') %}active{% endif %}"
+              href="/violations">Violations</a></li>
+          {% endif %}
+          <li class="nav-item"><a class="nav-link {% if request.url.path.startswith('/alerts') %}active{% endif %}"
+              href="/alerts">Alerts</a></li>
+          {% if role_code in ('complaint_officer', 'system_admin') %}
+          <li class="nav-item"><a class="nav-link {% if request.url.path.startswith('/complaints') %}active{% endif %}"
+              href="/complaints">Complaints</a></li>
+          <li class="nav-item"><a class="nav-link {% if request.url.path.startswith('/payments') %}active{% endif %}"
+              href="/payments">Payments</a></li>
+          {% endif %}
+          {% if role_code == 'system_admin' %}
+          <li class="nav-item"><a class="nav-link {% if request.url.path.startswith('/admin') %}active{% endif %}"
+              href="/admin">Admin</a></li>
+          {% endif %}
+        </ul>
+        <div class="d-flex align-items-center gap-3">
+          <div class="small text-end">
+            <div class="fw-semibold">{{ current_user.full_name }}</div>
+            <div class="text-muted">{{ current_user.role.name }}</div>
+          </div>
+          <form method="post" action="/auth/logout">
+            <button class="btn btn-outline-secondary btn-sm" type="submit">Sign out</button>
+          </form>
+        </div>
       </div>
       {% endif %}
-      {% block content %}{% endblock %}
-    </main>
+    </nav>
+  </header>
 
-    <footer class="app-footer text-muted small py-3 border-top mt-auto">
-      <div class="container d-flex flex-wrap justify-content-between gap-2">
-        <span>&copy; {{ settings.app_name }} &middot; Phase 1 manual enforcement</span>
-        <span>Local time zone: {{ settings.default_timezone }}</span>
-      </div>
-    </footer>
+  <main id="main-content" class="container py-4" tabindex="-1">
+    {% set notice = request.query_params.get('notice') %}
+    {% if notice %}
+    <div class="alert alert-{{ request.query_params.get('notice_level', 'info') }} alert-dismissible fade show mb-4"
+      role="status">
+      {{ notice }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Dismiss"></button>
+    </div>
+    {% endif %}
+    {% block content %}{% endblock %}
+  </main>
 
-    <script src="/static/vendor/bootstrap/bootstrap.bundle.min.js"></script>
-    <script src="/static/vendor/htmx/htmx.min.js"></script>
-    <script src="/static/vendor/alpine/alpine.min.js" defer></script>
-    <script src="/static/vendor/leaflet/leaflet.js"></script>
-    <script src="/static/js/app.js"></script>
-    <script src="/static/js/pwa-install.js"></script>
-    {% block scripts %}{% endblock %}
-  </body>
+  <div id="pwa-install-banner" class="pwa-install-banner" role="alert" aria-live="polite">
+    <div class="container d-flex align-items-center justify-content-between flex-wrap gap-2 py-2">
+      <span class="d-flex align-items-center gap-2">
+        <span aria-hidden="true" style="font-size:20px">📲</span>
+        <span class="fw-semibold">Install ALPR STMS for quick access</span>
+      </span>
+      <span class="d-flex gap-2">
+        <button id="pwa-install-btn" class="btn btn-sm btn-light fw-semibold">Install</button>
+        <button id="pwa-dismiss-btn" class="btn btn-sm btn-outline-light" aria-label="Dismiss">✕</button>
+      </span>
+    </div>
+  </div>
+
+  <footer class="app-footer text-muted small py-3 border-top mt-auto">
+    <div class="container d-flex flex-wrap justify-content-between gap-2">
+      <span>&copy; {{ settings.app_name }} &middot; Phase 1 manual enforcement</span>
+      <span>Local time zone: {{ settings.default_timezone }}</span>
+    </div>
+  </footer>
+
+  <script src="/static/vendor/bootstrap/bootstrap.bundle.min.js"></script>
+  <script src="/static/vendor/htmx/htmx.min.js"></script>
+  <script src="/static/vendor/alpine/alpine.min.js" defer></script>
+  <script src="/static/vendor/leaflet/leaflet.js"></script>
+  <script src="/static/js/app.js"></script>
+  <script src="/static/js/pwa-install.js"></script>
+  {% block scripts %}{% endblock %}
+</body>
+
 </html>
-

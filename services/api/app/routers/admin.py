@@ -1,4 +1,7 @@
-from fastapi import APIRouter, Depends, Request
+from urllib.parse import urlencode
+
+from fastapi import APIRouter, Depends, Form, Request
+from fastapi.responses import RedirectResponse
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session, joinedload
 
@@ -9,11 +12,13 @@ from app.db.session import get_db
 from app.models.domain import (
     AuditLog,
     PaymentRequest,
+    Role,
     Subcity,
     User,
     Violation,
     ViolationRule,
 )
+from app.services.workflows import create_user_account, reset_user_account_password, toggle_user_account_active
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 
@@ -40,6 +45,7 @@ def admin_page(
         .scalars()
         .all()
     )
+    roles = db.execute(select(Role).order_by(Role.name)).scalars().all()
     subcities = (
         db.execute(select(Subcity).order_by(Subcity.name)).scalars().all()
     )
@@ -62,7 +68,60 @@ def admin_page(
             },
             "recent_audits": recent_audits,
             "users": users,
+            "roles": roles,
             "subcities": subcities,
             "user_counts_by_subcity": user_counts_by_subcity,
         },
     )
+
+
+@router.post("/users")
+def admin_create_user(
+    username: str = Form(...),
+    full_name: str = Form(...),
+    role_id: str = Form(...),
+    subcity_id: str | None = Form(default=None),
+    password: str = Form(...),
+    phone_number: str | None = Form(default=None),
+    current_user: User = Depends(require_roles(ROLE_SYSTEM_ADMIN)),
+    db: Session = Depends(get_db),
+):
+    try:
+        create_user_account(
+            db,
+            actor=current_user,
+            username=username,
+            full_name=full_name,
+            password=password,
+            role_id=role_id,
+            subcity_id=subcity_id or None,
+            phone_number=phone_number,
+        )
+    except ValueError as exc:
+        params = urlencode({"notice": str(exc), "notice_level": "danger"})
+        return RedirectResponse(f"/admin?{params}", status_code=303)
+    params = urlencode({"notice": "User created", "notice_level": "success"})
+    return RedirectResponse(f"/admin?{params}", status_code=303)
+
+
+@router.post("/users/{user_id}/toggle-active")
+def admin_toggle_user_active(
+    user_id: str,
+    current_user: User = Depends(require_roles(ROLE_SYSTEM_ADMIN)),
+    db: Session = Depends(get_db),
+):
+    toggle_user_account_active(db, actor=current_user, user_id=user_id)
+    params = urlencode({"notice": "User status updated", "notice_level": "success"})
+    return RedirectResponse(f"/admin?{params}", status_code=303)
+
+
+@router.post("/users/{user_id}/reset-password")
+def admin_reset_user_password(
+    user_id: str,
+    password: str = Form(...),
+    current_user: User = Depends(require_roles(ROLE_SYSTEM_ADMIN)),
+    db: Session = Depends(get_db),
+):
+    reset_user_account_password(db, actor=current_user, user_id=user_id, password=password)
+    params = urlencode({"notice": "Password reset", "notice_level": "success"})
+    return RedirectResponse(f"/admin?{params}", status_code=303)

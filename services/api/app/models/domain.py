@@ -52,6 +52,7 @@ class User(Base):
     role: Mapped[Role] = relationship(back_populates="users")
     default_subcity: Mapped[Subcity | None] = relationship(back_populates="users")
     assignments: Mapped[list[OfficerAssignment]] = relationship(back_populates="user")
+    locations: Mapped[list[OfficerLocation]] = relationship(back_populates="user")
 
 
 class OfficerAssignment(Base):
@@ -93,7 +94,7 @@ class Violation(Base):
     driver_phone_number: Mapped[str | None] = mapped_column(String(32))
     status: Mapped[str] = mapped_column(String(64), nullable=False)
     draft_penalty_amount: Mapped[Decimal] = mapped_column(Numeric(10, 2), nullable=False)
-    location_text: Mapped[str] = mapped_column(String(255), nullable=False)
+    location_text: Mapped[str | None] = mapped_column(String(255))
     latitude: Mapped[str | None] = mapped_column(String(64))
     longitude: Mapped[str | None] = mapped_column(String(64))
     escape_path_geojson: Mapped[dict[str, Any] | None] = mapped_column(JSON)
@@ -248,3 +249,16 @@ class SessionModel(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow, nullable=False)
 
     user: Mapped[User] = relationship()
+
+
+class OfficerLocation(Base):
+    __tablename__ = "officer_locations"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    user_id: Mapped[str] = mapped_column(ForeignKey("users.id"), nullable=False)
+    latitude: Mapped[str] = mapped_column(String(64), nullable=False)
+    longitude: Mapped[str] = mapped_column(String(64), nullable=False)
+    captured_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow, nullable=False)
+
+    user: Mapped[User] = relationship(back_populates="locations")

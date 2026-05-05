@@ -11,10 +11,10 @@ important for field reporting.
 
 - App URL (local): http://localhost:8080
 - Default accounts (seeded by `app.bootstrap`):
-  - Traffic officer: traffic.officer1
-  - Subcity officer: subcity.central
-  - Complaint officer: complaints.officer
-  - Admin: sys.admin
+  - Traffic officer: TP1
+  - Subcity officer: SC1
+  - Complaint officer: CO1
+  - Admin: ADMIN1
 - Passwords come from `.env` values:
   - OFFICER_DEFAULT_PASSWORD
   - SUBCITY_DEFAULT_PASSWORD
@@ -32,7 +32,7 @@ Rotate them before any production use.
 
 ## Traffic officer workflow (reporting)
 
-1. Sign in as `traffic.officer1`.
+1. Sign in as `TP1`.
 2. Open the Violations page.
 3. Fill in the violation rule, plate, and location description.
 4. Allow device location when prompted.
@@ -47,13 +47,13 @@ Rotate them before any production use.
 
 ## Subcity officer workflow (alerts)
 
-1. Sign in as `subcity.central`.
+1. Sign in as `SC1`.
 2. Open Alerts.
 3. Review the broadcasted alert and acknowledge it.
 
 ## Complaint officer workflow (review + payments)
 
-1. Sign in as `complaints.officer`.
+1. Sign in as `CO1`.
 2. Open Complaints.
 3. For an OPEN complaint:
    - Choose Confirm or Revoke.
@@ -65,7 +65,7 @@ Rotate them before any production use.
 
 ## Admin workflow (overview)
 
-1. Sign in as `sys.admin`.
+1. Sign in as `ADMIN1`.
 2. Open Admin to review:
    - user counts
    - violations and payments totals

@@ -9,6 +9,8 @@ if (form instanceof HTMLFormElement) {
   const mapElement = document.getElementById("escape-path-map");
   const locationStatus = document.getElementById("location-status");
   const clearPathButton = document.querySelector("[data-clear-path]");
+  const nearbyMapElement = document.getElementById("nearby-officers-map");
+  const nearbyDataElement = document.getElementById("nearby-officers-data");
   let map = null;
   let locationMarker = null;
   let hasCenteredOnLocation = false;
@@ -91,6 +93,13 @@ if (form instanceof HTMLFormElement) {
       longitudeInput.value = String(lng);
     }
     lastLocation = { lat, lng };
+    const payload = new URLSearchParams({ latitude: String(lat), longitude: String(lng) });
+    fetch("/api/officers/location", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: payload.toString(),
+      credentials: "same-origin",
+    }).catch(() => null);
     updateMapLocation(lat, lng);
     setLocationStatus("Device location captured.");
     persistDraft();
@@ -140,6 +149,9 @@ if (form instanceof HTMLFormElement) {
     };
 
     map.on("click", (event) => {
+      if (polyline.getLatLngs().length === 0 && lastLocation) {
+        polyline.addLatLng([lastLocation.lat, lastLocation.lng]);
+      }
       const point = [event.latlng.lat, event.latlng.lng];
       markers.push(window.L.circleMarker(point, { radius: 4, color: "#0f766e" }).addTo(map));
       polyline.addLatLng(point);
@@ -173,6 +185,28 @@ if (form instanceof HTMLFormElement) {
 
     if (lastLocation) {
       updateMapLocation(lastLocation.lat, lastLocation.lng);
+    }
+  }
+
+  if (nearbyMapElement && window.L) {
+    const nearbyMap = window.L.map(nearbyMapElement).setView([7.0621, 38.4767], 13);
+    window.L.tileLayer(window.document.body.dataset.tiles || "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      attribution: "&copy; OpenStreetMap contributors",
+    }).addTo(nearbyMap);
+    if (nearbyDataElement) {
+      try {
+        const officers = JSON.parse(nearbyDataElement.textContent || "[]");
+        officers.forEach((officer) => {
+          const lat = parseFloat(officer.latitude);
+          const lng = parseFloat(officer.longitude);
+          if (Number.isNaN(lat) || Number.isNaN(lng)) {
+            return;
+          }
+          window.L.marker([lat, lng]).addTo(nearbyMap).bindPopup(`${officer.username} - ${officer.full_name}`);
+        });
+      } catch (_) {
+        // ignore parse issues for optional map payload
+      }
     }
   }
 }

@@ -59,7 +59,7 @@ def test_health_ready_returns_json_even_with_html_accept() -> None:
 def test_traffic_officer_admin_access_denied_html() -> None:
     settings = get_settings()
     with TestClient(app) as c:
-        _login(c, "traffic.officer1", settings.officer_default_password)
+        _login(c, "TP1", settings.officer_default_password)
         response = c.get("/admin", headers={"accept": "text/html"})
         assert response.status_code == 403
         body = response.text
@@ -70,7 +70,7 @@ def test_traffic_officer_admin_access_denied_html() -> None:
 def test_violations_filter_renders_status_options() -> None:
     settings = get_settings()
     with TestClient(app) as c:
-        _login(c, "traffic.officer1", settings.officer_default_password)
+        _login(c, "TP1", settings.officer_default_password)
         response = c.get("/violations?status=REPORTED")
         assert response.status_code == 200
         body = response.text
@@ -82,7 +82,7 @@ def test_violations_filter_renders_status_options() -> None:
 def test_admin_dashboard_renders_users_and_subcities() -> None:
     settings = get_settings()
     with TestClient(app) as c:
-        _login(c, "sys.admin", settings.admin_default_password)
+        _login(c, "ADMIN1", settings.admin_default_password)
         response = c.get("/admin")
         assert response.status_code == 200
         body = response.text
@@ -93,7 +93,7 @@ def test_admin_dashboard_renders_users_and_subcities() -> None:
 def test_alerts_listing_uses_status_badge_macro() -> None:
     settings = get_settings()
     with TestClient(app) as c:
-        _login(c, "sys.admin", settings.admin_default_password)
+        _login(c, "ADMIN1", settings.admin_default_password)
         response = c.get("/alerts")
         assert response.status_code == 200
         body = response.text
@@ -104,7 +104,7 @@ def test_alerts_listing_uses_status_badge_macro() -> None:
 def test_complaints_listing_renders_queue_filters() -> None:
     settings = get_settings()
     with TestClient(app) as c:
-        _login(c, "complaints.officer", settings.complaint_default_password)
+        _login(c, "CO1", settings.complaint_default_password)
         response = c.get("/complaints?status=OPEN")
         assert response.status_code == 200
         body = response.text
@@ -117,7 +117,7 @@ def test_complaints_listing_renders_queue_filters() -> None:
 def test_payments_listing_renders_request_filters() -> None:
     settings = get_settings()
     with TestClient(app) as c:
-        _login(c, "sys.admin", settings.admin_default_password)
+        _login(c, "ADMIN1", settings.admin_default_password)
         response = c.get("/payments?status=REQUESTED")
         assert response.status_code == 200
         body = response.text
@@ -130,7 +130,7 @@ def test_payments_listing_renders_request_filters() -> None:
 def test_404_error_page_keeps_logged_in_navigation() -> None:
     settings = get_settings()
     with TestClient(app) as c:
-        _login(c, "sys.admin", settings.admin_default_password)
+        _login(c, "ADMIN1", settings.admin_default_password)
         response = c.get("/does-not-exist", headers={"accept": "text/html"})
         assert response.status_code == 404
         body = response.text

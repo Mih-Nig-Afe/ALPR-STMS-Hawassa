@@ -16,10 +16,10 @@ filenames listed below.
 
 ## Accounts used
 
-- traffic.officer1 (Traffic Officer)
-- subcity.central (Subcity Officer)
-- complaints.officer (Complaint Officer)
-- sys.admin (System Administrator)
+- TP1 (Traffic Officer)
+- SC1 (Subcity Officer)
+- CO1 (Complaint Officer)
+- ADMIN1 (System Administrator)
 
 Passwords are defined in `.env`:
 `OFFICER_DEFAULT_PASSWORD`, `SUBCITY_DEFAULT_PASSWORD`,
@@ -36,7 +36,7 @@ Screenshot: `login.png`
 
 ### 2) Traffic officer - Violations
 
-- Sign in as `traffic.officer1`
+- Sign in as `TP1`
 - Confirm the violation report form renders
 - Confirm location auto-capture status message appears
 - Use the map to draw an escape path and clear it once
@@ -48,7 +48,7 @@ Screenshots:
 
 ### 3) Subcity officer - Alerts
 
-- Sign in as `subcity.central`
+- Sign in as `SC1`
 - Open `/alerts`
 - Acknowledge the new alert
 
@@ -56,7 +56,7 @@ Screenshot: `alerts-inbox.png`
 
 ### 4) Complaint officer - Complaints
 
-- Sign in as `complaints.officer`
+- Sign in as `CO1`
 - Open `/complaints`
 - Confirm a complaint and add notes
 
@@ -71,7 +71,7 @@ Screenshot: `payments-queue.png`
 
 ### 6) Admin - Overview
 
-- Sign in as `sys.admin`
+- Sign in as `ADMIN1`
 - Open `/admin`
 - Confirm stats and audit table render
 

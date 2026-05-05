@@ -37,7 +37,12 @@
         {% for recipient in recipients %}
         <tr>
           <td><a href="/violations/{{ recipient.alert.violation.id }}">{{ recipient.alert.violation.reference_code }}</a></td>
-          <td>{{ recipient.alert.message }}</td>
+          <td>
+            {% if recipient.alert.message.startswith('[HIGH ALERT]') %}
+            <span class="badge text-bg-danger me-2">High Alert</span>
+            {% endif %}
+            {{ recipient.alert.message }}
+          </td>
           <td>{{ recipient.user.full_name }}</td>
           <td>{{ status_badge(recipient.status) }}</td>
           <td class="text-end">

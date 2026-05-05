@@ -6,7 +6,7 @@
 {% block content %}
 {{ page_title('Violations', 'Report incidents and review your reports.') }}
 <div class="row g-4">
-  <div class="col-xl-5">
+  <div class="col-xl-5 {% if filters.tab != 'active' %}d-none{% endif %}">
     <section class="panel">
       <div class="panel-header">
         <h2 class="h5 mb-1">Report violation</h2>
@@ -41,8 +41,8 @@
 
         <div>
           <label class="form-label" for="location_text">Location description</label>
-          <input class="form-control" id="location_text" name="location_text" placeholder="Main road near..." required maxlength="255">
-          <div class="form-text" id="location-status" aria-live="polite">Device location will auto-fill when permission is granted.</div>
+          <input class="form-control" id="location_text" name="location_text" placeholder="Optional backup if GPS is unavailable" maxlength="255">
+          <div class="form-text" id="location-status" aria-live="polite">Optional backup for geolocation; add this only when device location is unavailable.</div>
         </div>
 
         <div>
@@ -61,6 +61,7 @@
             <span class="small text-muted" id="escape-path-help">Tap points on the map to build the path.</span>
           </div>
           <div id="escape-path-map" class="map-panel" role="img" aria-label="Escape path map" aria-describedby="escape-path-help"></div>
+          <div class="small text-muted mt-2">Path starts from your current location and continues through pinned points.</div>
           <div class="d-flex justify-content-end mt-2">
             <button class="btn btn-sm btn-outline-secondary" type="button" data-clear-path>Clear path</button>
           </div>
@@ -71,7 +72,7 @@
     </section>
   </div>
 
-  <div class="col-xl-7">
+  <div class="{% if filters.tab == 'active' %}col-xl-7{% else %}col-12{% endif %}">
     <section class="panel">
       <div class="panel-header d-flex flex-wrap justify-content-between align-items-start gap-2">
         <div>
@@ -80,7 +81,13 @@
         </div>
         <span class="badge text-bg-light align-self-center">{{ violations|length }} record{{ '' if violations|length == 1 else 's' }}</span>
       </div>
+      <ul class="nav nav-tabs mb-3">
+        <li class="nav-item"><a class="nav-link {% if filters.tab == 'active' %}active{% endif %}" href="/violations?tab=active">Active Violations + Form</a></li>
+        <li class="nav-item"><a class="nav-link {% if filters.tab == 'reported' %}active{% endif %}" href="/violations?tab=reported">Reported Cases</a></li>
+        <li class="nav-item"><a class="nav-link {% if filters.tab == 'intercepted' %}active{% endif %}" href="/violations?tab=intercepted">Intercepted Vehicles</a></li>
+      </ul>
       <form class="filter-bar" method="get" action="/violations" role="search" aria-label="Filter violations">
+        <input type="hidden" name="tab" value="{{ filters.tab }}">
         <input class="form-control form-control-sm" style="max-width: 240px" type="search" name="q" value="{{ filters.q or '' }}" placeholder="Search plate or reference">
         <select class="form-select form-select-sm" style="max-width: 200px" name="status" aria-label="Status filter">
           <option value="">All statuses</option>
@@ -117,6 +124,19 @@
           </tbody>
         </table>
       </div>
+    </section>
+    <section class="panel mt-4">
+      <div class="panel-header">
+        <h2 class="h5 mb-1">Nearby traffic officers</h2>
+        <p class="text-muted mb-0">Live markers from recent location updates for high-alert broadcast targeting.</p>
+      </div>
+      <div id="nearby-officers-map" class="map-panel" role="img" aria-label="Nearby officers map"></div>
+      <div class="small text-muted mt-2">Markers shown: {{ nearby_officers|length }}</div>
+      <script id="nearby-officers-data" type="application/json">[
+        {% for location, user in nearby_officers %}
+        {"username":"{{ user.username }}","full_name":"{{ user.full_name }}","latitude":"{{ location.latitude }}","longitude":"{{ location.longitude }}","captured_at":"{{ datetime_iso(location.captured_at) }}"}{% if not loop.last %},{% endif %}
+        {% endfor %}
+      ]</script>
     </section>
   </div>
 </div>

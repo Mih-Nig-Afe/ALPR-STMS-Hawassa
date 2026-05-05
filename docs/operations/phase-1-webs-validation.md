@@ -65,7 +65,7 @@ docker compose exec -T supabase-db psql -U postgres -d postgres -c "select id, r
 
 ## P1-PWA-002: Mobile-first officer reporting walkthrough
 
-- Viewport set to 390x844 and logged in as `traffic.officer1`.
+- Viewport set to 390x844 and logged in as `TP1`.
 - Submitted a violation with evidence upload, escape path points, and notes.
 - Evidence thumbnail renders on the detail screen after submission.
 - Screenshots captured: `pwa-violations-form.png`, `pwa-violations-detail.png`.

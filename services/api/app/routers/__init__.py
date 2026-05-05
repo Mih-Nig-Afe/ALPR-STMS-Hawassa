@@ -1,3 +1,3 @@
-from app.routers import admin, alerts, auth, complaints, home, payments, violations
+from app.routers import admin, alerts, api, auth, complaints, home, payments, violations
 
-__all__ = ["admin", "alerts", "auth", "complaints", "home", "payments", "violations"]
+__all__ = ["admin", "alerts", "api", "auth", "complaints", "home", "payments", "violations"]

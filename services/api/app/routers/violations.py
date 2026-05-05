@@ -21,7 +21,7 @@ from alpr_stms_shared.constants import (
 from app.auth.dependencies import require_roles, require_user
 from app.core.templating import templates
 from app.db.session import get_db
-from app.models.domain import User, Violation, ViolationEvidence, ViolationRule
+from app.models.domain import OfficerLocation, User, Violation, ViolationEvidence, ViolationRule
 from app.services.workflows import ViolationInput, apply_stop_outcome, create_violation
 from app.storage.client import StorageClient
 
@@ -43,6 +43,7 @@ def violations_page(
     request: Request,
     q: str | None = None,
     status: str | None = None,
+    tab: str | None = None,
     current_user: User = Depends(require_roles(ROLE_TRAFFIC_OFFICER, ROLE_SYSTEM_ADMIN)),
     db: Session = Depends(get_db),
 ):
@@ -51,6 +52,9 @@ def violations_page(
         .scalars()
         .all()
     )
+    selected_tab = (tab or "active").strip().lower()
+    if selected_tab not in {"active", "reported", "intercepted"}:
+        selected_tab = "active"
     query = (
         select(Violation)
         .options(joinedload(Violation.rule), joinedload(Violation.evidence_items))
@@ -67,9 +71,29 @@ def violations_page(
                 func.upper(Violation.reference_code).like(like),
             )
         )
+    if selected_tab == "active":
+        query = query.where(Violation.status.in_([VIOLATION_STATUS_REPORTED, VIOLATION_STATUS_BROADCASTED]))
+    elif selected_tab == "intercepted":
+        query = query.where(
+            Violation.status.in_(
+                [VIOLATION_STATUS_CONFIRMED, VIOLATION_STATUS_PAYMENT_PENDING, VIOLATION_STATUS_PAID]
+            )
+        )
     if status_clean and status_clean in VIOLATION_STATUS_OPTIONS:
         query = query.where(Violation.status == status_clean)
     violations = db.execute(query).unique().scalars().all()
+    nearby_officers = (
+        db.execute(
+            select(OfficerLocation, User)
+            .join(User, OfficerLocation.user_id == User.id)
+            .where(User.is_active.is_(True))
+            .where(User.id != current_user.id)
+            .where(User.role.has(code=ROLE_TRAFFIC_OFFICER))
+            .order_by(OfficerLocation.captured_at.desc())
+            .limit(30)
+        )
+        .all()
+    )
     return templates.TemplateResponse(
         request,
         "violations/index.html",
@@ -81,7 +105,9 @@ def violations_page(
                 "q": q_clean,
                 "status": status_clean,
                 "status_options": list(VIOLATION_STATUS_OPTIONS),
+                "tab": selected_tab,
             },
+            "nearby_officers": nearby_officers,
         },
     )
 
@@ -92,7 +118,7 @@ async def create_violation_submit(
     rule_id: str = Form(...),
     vehicle_plate: str = Form(...),
     driver_phone_number: str | None = Form(default=None),
-    location_text: str = Form(...),
+    location_text: str | None = Form(default=None),
     latitude: str | None = Form(default=None),
     longitude: str | None = Form(default=None),
     escape_path_geojson: str | None = Form(default=None),
@@ -123,6 +149,8 @@ async def create_violation_submit(
     )
     params = urlencode({"notice": f"Violation {violation.reference_code} saved", "notice_level": "success"})
     return RedirectResponse(f"/violations/{violation.id}?{params}", status_code=303)
+
+
 
 
 @router.get("/{violation_id}")
