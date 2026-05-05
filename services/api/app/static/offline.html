@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Offline | ALPR STMS Hawassa</title>
+    <style>
+      :root {
+        color-scheme: light;
+      }
+      body {
+        margin: 0;
+        font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+        background: #f4f7fb;
+        color: #0f172a;
+      }
+      .shell {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+      }
+      .card {
+        max-width: 520px;
+        width: 100%;
+        background: #ffffff;
+        border-radius: 16px;
+        box-shadow: 0 18px 40px rgba(15, 23, 42, 0.12);
+        padding: 24px;
+      }
+      h1 {
+        margin: 0 0 8px 0;
+        font-size: 22px;
+      }
+      p {
+        margin: 0 0 16px 0;
+        line-height: 1.5;
+      }
+      ul {
+        margin: 0 0 16px 20px;
+        padding: 0;
+      }
+      .actions {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+      button {
+        border: 0;
+        padding: 10px 18px;
+        border-radius: 10px;
+        background: #1d4ed8;
+        color: #ffffff;
+        font-weight: 600;
+        cursor: pointer;
+      }
+      button.secondary {
+        background: #e2e8f0;
+        color: #0f172a;
+      }
+      .note {
+        font-size: 13px;
+        color: #475569;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="shell">
+      <section class="card" aria-live="polite">
+        <h1>You are offline</h1>
+        <p>The ALPR STMS dashboard needs a network connection to load live data.</p>
+        <ul>
+          <li>Check your connection and retry.</li>
+          <li>Keep this tab open to resume when the network returns.</li>
+          <li>Evidence uploads require connectivity to complete.</li>
+        </ul>
+        <div class="actions">
+          <button type="button" onclick="location.reload()">Retry now</button>
+          <button type="button" class="secondary" onclick="history.back()">Go back</button>
+        </div>
+        <p class="note">If this screen keeps appearing, the network is unavailable or the server is down.</p>
+      </section>
+    </main>
+  </body>
+</html>

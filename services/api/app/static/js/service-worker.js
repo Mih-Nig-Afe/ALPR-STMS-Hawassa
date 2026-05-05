@@ -1,4 +1,5 @@
-const CACHE_NAME = "alpr-stms-shell-v2";
+const CACHE_NAME = "alpr-stms-shell-v3";
+const OFFLINE_URL = "/static/offline.html";
 const SHELL_FILES = [
   "/static/css/app.css",
   "/static/js/app.js",
@@ -8,6 +9,7 @@ const SHELL_FILES = [
   "/static/images/icon-180.png",
   "/static/images/icon-192.png",
   "/static/images/icon-512.png",
+  OFFLINE_URL,
 ];
 
 self.addEventListener("install", (event) => {
@@ -18,13 +20,17 @@ self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") {
     return;
   }
-  event.respondWith(
-    caches.match(event.request).then((cached) => {
-      if (cached) {
-        return cached;
-      }
-      return fetch(event.request);
-    }),
+  const request = event.request;
+  if (request.mode === "navigate" || (request.headers.get("accept") || "").includes("text/html")) {
+    event.respondWith(fetch(request).catch(() => caches.match(OFFLINE_URL)));
+    return;
+  }
+  event.respondWith(caches.match(request).then((cached) => cached || fetch(request)));
+});
+
+self.addEventListener("activate", (event) => {
+  event.waitUntil(
+    caches.keys().then((keys) => Promise.all(keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key)))),
   );
 });
 

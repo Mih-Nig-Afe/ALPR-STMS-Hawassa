@@ -76,3 +76,4 @@ docker compose exec -T supabase-db psql -U postgres -d postgres -c "select id, r
 - Offline submission attempt fails with `net::ERR_INTERNET_DISCONNECTED`.
 - Map tile requests abort while offline, so the map surface does not render.
 - Headless offline error screenshot rendered blank; file stored as `pwa-offline-error.png`.
+- Service worker now returns `/static/offline.html` via fetch catch for HTML navigations.

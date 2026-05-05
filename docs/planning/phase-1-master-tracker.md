@@ -227,6 +227,7 @@
 | 2026-05-04 | Webs walkthrough screenshots captured; responsive tap targets tuned; mobile/desktop UI evidence added; tracker evidence refreshed |
 | 2026-05-04 | Webs validation sweep documented; PWA manifest icons and service-worker cache updated for install checks |
 | 2026-05-05 | PWA mobile walkthrough and offline/degraded checks documented with new screenshots |
+| 2026-05-05 | Offline fallback page added to service worker cache for degraded connectivity |
 
 ## 15. Deployment readiness gate
 
