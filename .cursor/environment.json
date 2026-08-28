@@ -1,0 +1,19 @@
+{
+  "name": "ALPR STMS Hawassa",
+  "user": "ubuntu",
+  "install": "bash .cursor/scripts/install.sh",
+  "start": "bash .cursor/scripts/start.sh",
+  "terminals": [
+    {
+      "name": "compose-logs",
+      "command": "bash .cursor/scripts/ensure-docker.sh >/dev/null 2>&1; docker compose logs -f --tail=100"
+    }
+  ],
+  "ports": [
+    { "name": "app", "port": 8080 },
+    { "name": "mailhog", "port": 8025 },
+    { "name": "storage", "port": 15000 },
+    { "name": "postgrest", "port": 13000 },
+    { "name": "postgres", "port": 55432 }
+  ]
+}
